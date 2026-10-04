@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#06060c">
+<meta name="description" content="فحص السرعة — SpeedCheck: اختبار سرعة إنترنت دقيق وسريع. قياس التحميل والرفع والاستجابة في ثوانٍ.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="فحص">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+<link rel="apple-touch-icon" href="/icons/icon-192.svg">
+<title>فحص السرعة — SpeedCheck</title>
+<style>
+/* Critical CSS inlined for FCP */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060c;--surface:rgba(15,23,42,.6);--surface-solid:#0f172a;--border:rgba(99,102,241,.15);
+  --text:#f1f5f9;--text-muted:#64748b;--accent:#6366f1;--accent2:#8b5cf6;--success:#10b981;
+  --warning:#f59e0b;--danger:#ef4444;--glow:rgba(99,102,241,.4);
+  --radius:16px;--radius-sm:10px;
+  --font-sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-arabic:'Tajawal','Cairo',system-ui,sans-serif;
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font-arabic),var(--font-sans);
+  background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;
+  overflow-x:hidden;line-height:1.6;
+  background:radial-gradient(ellipse at 20% 0%,rgba(99,102,241,.08) 0%,transparent 50%),
+             radial-gradient(ellipse at 80% 100%,rgba(139,92,246,.06) 0%,transparent 50%),
+             var(--bg);
+}
+.light-mode{
+  --bg:#ffffff;--surface:#f8fafc;--surface-solid:#ffffff;--border:rgba(0,0,0,.08);
+  --text:#0f172a;--text-muted:#64748b;--glow:rgba(99,102,241,.2);
+  background:radial-gradient(ellipse at 20% 0%,rgba(99,102,241,.04) 0%,transparent 50%),
+             radial-gradient(ellipse at 80% 100%,rgba(139,92,246,.03) 0%,transparent 50%),
+             #ffffff;
+}
+.tabular-nums{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<!-- Skip link for accessibility -->
+<a href="#main" class="skip-link">تخطي إلى المحتوى</a>
+
+<!-- Navigation -->
+<nav class="nav" role="navigation" aria-label="التنقل الرئيسي">
+  <div class="container nav-inner">
+    <div class="nav-brand">
+      <svg class="brand-icon" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+        <defs>
+          <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6366f1"/>
+            <stop offset="100%" stop-color="#8b5cf6"/>
+          </linearGradient>
+        </defs>
+        <circle cx="16" cy="16" r="13" fill="none" stroke="url(#brandGrad)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="50 82" transform="rotate(-90 16 16)"/>
+        <circle cx="16" cy="16" r="3" fill="url(#brandGrad)"/>
+        <line x1="16" y1="16" x2="16" y2="7" stroke="url(#brandGrad)" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-text gradient-text" data-i18n="appName">فحص السرعة</span>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-btn" id="installBtn" aria-label="تثبيت التطبيق" style="display:none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <button class="nav-btn" id="historyBtn" aria-label="سجل الاختبارات">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </button>
+      <button class="nav-btn" id="analyticsBtn" aria-label="التحليلات">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </button>
+      <button class="nav-btn" id="compareBtn" aria-label="مقارنة">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+      </button>
+      <button class="nav-btn" id="authBtn" aria-label="الحساب">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+      <button class="nav-btn" id="settingsBtn" aria-label="الإعدادات">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+      <button class="nav-btn" id="langBtn" aria-label="Language">EN</button>
+      <button class="nav-btn" id="themeBtn" aria-label="تبديل المظهر">
+        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Connection info bar -->
+<div class="conn-bar" id="connBar">
+  <div class="container conn-bar-inner">
+    <div class="conn-item">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText" data-i18n="ready">جاهز</span>
+    </div>
+    <div class="conn-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+      <span id="ipText">—</span>
+    </div>
+    <div class="conn-item" id="ispItem" style="display:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+      <span id="ispText">—</span>
+    </div>
+    <div class="conn-item" id="connTypeItem" style="display:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/></svg>
+      <span id="connTypeText">—</span>
+    </div>
+    <div class="conn-item" id="serverItem" style="display:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span id="serverText">Cloudflare</span>
+    </div>
+  </div>
+</div>
+
+<!-- Main content -->
+<main id="main" class="main">
+  <div class="container">
+    <!-- Hero section with gauge -->
+    <section class="hero">
+      <div class="gauge-container">
+        <svg id="gauge" viewBox="0 0 300 300" width="100%" aria-label="مؤشر السرعة" role="img">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="50%" stop-color="#8b5cf6"/>
+              <stop offset="100%" stop-color="#a855f7"/>
+            </linearGradient>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+              <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- Background track -->
+          <circle cx="150" cy="150" r="125" fill="none" stroke="rgba(99,102,241,.1)" stroke-width="12" stroke-linecap="round"/>
+          <!-- Tick marks -->
+          <g id="gaugeTicks" stroke="rgba(241,245,249,.2)" stroke-width="1"></g>
+          <!-- Progress arc -->
+          <circle id="gaugeArc" cx="150" cy="150" r="125" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 785.4" transform="rotate(135 150 150)" filter="url(#glow)"/>
+          <!-- Inner pulse ring during test -->
+          <circle id="gaugePulse" cx="150" cy="150" r="110" fill="none" stroke="rgba(99,102,241,.2)" stroke-width="2" opacity="0"/>
+        </svg>
+        <!-- Center content -->
+        <div class="gauge-center">
+          <div class="speed-number" id="speedNumber" aria-live="polite">
+            <span class="tabular-nums" id="speedValue">0.0</span>
+          </div>
+          <div class="speed-unit" data-i18n="Mbps">ميجابت/ث</div>
+          <div class="speed-status" id="speedStatus" data-i18n="pressStart">اضغط للبدء</div>
+        </div>
+      </div>
+
+      <!-- Start/Stop Button -->
+      <button class="start-btn" id="startBtn" aria-label="ابدأ الاختبار">
+        <span class="btn-content">
+          <svg class="btn-icon play-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg class="btn-icon stop-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+          <svg class="btn-icon refresh-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          <span class="btn-text" data-i18n="startTest">ابدأ الاختبار</span>
+        </span>
+      </button>
+
+      <!-- Phase stepper -->
+      <div class="stepper" id="stepper" role="list">
+        <div class="step" data-phase="ping" role="listitem">
+          <div class="step-circle"><span class="step-num">1</span><svg class="step-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="step-label" data-i18n="ping">البنق</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" data-phase="download" role="listitem">
+          <div class="step-circle"><span class="step-num">2</span><svg class="step-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="step-label" data-i18n="download">التحميل</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" data-phase="upload" role="listitem">
+          <div class="step-circle"><span class="step-num">3</span><svg class="step-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="step-label" data-i18n="upload">الرفع</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" data-phase="done" role="listitem">
+          <div class="step-circle"><span class="step-num">4</span><svg class="step-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="step-label" data-i18n="done">اكتمل</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Error message -->
+    <div class="error-box" id="errorBox" style="display:none" role="alert">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="errorText"></span>
+      <button class="btn-retry" id="retryBtn" data-i18n="retry">إعادة المحاولة</button>
+    </div>
+
+    <!-- Real-time chart -->
+    <section class="chart-section" id="chartSection" style="display:none">
+      <div class="card chart-card">
+        <div class="chart-header">
+          <h3 data-i18n="realtimeChart">السرعة خلال الاختبار</h3>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#6366f1"></span><span data-i18n="download">التحميل</span></span>
+            <span class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span><span data-i18n="upload">الرفع</span></span>
+          </div>
+        </div>
+        <canvas id="speedChart" width="800" height="200"></canvas>
+      </div>
+    </section>
+
+    <!-- Results section -->
+    <section class="results" id="resultsSection" style="display:none" aria-live="polite">
+      <!-- Grade display -->
+      <div class="grade-display" id="gradeDisplay">
+        <div class="grade-badge" id="gradeBadge">—</div>
+        <div class="grade-text">
+          <div class="grade-title" id="gradeTitle">—</div>
+          <div class="grade-desc" id="gradeDesc">—</div>
+        </div>
+        <button class="share-btn" id="shareBtn" aria-label="مشاركة النتائج">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span data-i18n="share">مشاركة</span>
+        </button>
+      </div>
+
+      <!-- Metric cards -->
+      <div class="metrics-grid">
+        <div class="metric-card" id="downloadCard">
+          <div class="metric-header">
+            <div class="metric-icon icon-download">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </div>
+            <span class="metric-label" data-i18n="download">التحميل</span>
+          </div>
+          <div class="metric-value">
+            <span class="tabular-nums" id="downloadValue">—</span>
+            <span class="metric-unit" data-i18n="Mbps">ميجابت/ث</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill download-fill" id="downloadBar"></div></div>
+          <div class="metric-quality" id="downloadQuality">—</div>
+        </div>
+
+        <div class="metric-card" id="uploadCard">
+          <div class="metric-header">
+            <div class="metric-icon icon-upload">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <span class="metric-label" data-i18n="upload">الرفع</span>
+          </div>
+          <div class="metric-value">
+            <span class="tabular-nums" id="uploadValue">—</span>
+            <span class="metric-unit" data-i18n="Mbps">ميجابت/ث</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill upload-fill" id="uploadBar"></div></div>
+          <div class="metric-quality" id="uploadQuality">—</div>
+        </div>
+
+        <div class="metric-card" id="pingCard">
+          <div class="metric-header">
+            <div class="metric-icon icon-ping">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l3-9 6 18 3-9h5"/></svg>
+            </div>
+            <span class="metric-label" data-i18n="ping">الاستجابة</span>
+          </div>
+          <div class="metric-value">
+            <span class="tabular-nums" id="pingValue">—</span>
+            <span class="metric-unit">ms</span>
+          </div>
+          <div class="ping-bar-container" id="pingBarContainer" style="display:none">
+            <div class="ping-bar"><div class="ping-fill" id="pingBar"></div></div>
+          </div>
+          <div class="metric-quality" id="pingQuality">—</div>
+        </div>
+
+        <div class="metric-card" id="jitterCard">
+          <div class="metric-header">
+            <div class="metric-icon icon-jitter">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/></svg>
+            </div>
+            <span class="metric-label" data-i18n="jitter">التذبذب</span>
+          </div>
+          <div class="metric-value">
+            <span class="tabular-nums" id="jitterValue">—</span>
+            <span class="metric-unit">ms</span>
+          </div>
+          <div class="metric-quality" id="jitterQuality">—</div>
+        </div>
+      </div>
+
+      <!-- Advanced metrics -->
+      <div class="advanced-metrics" id="advancedMetrics" style="display:none">
+        <div class="card">
+          <h3 class="section-title" data-i18n="advancedMetrics">مقاييس متقدمة</h3>
+          <div class="adv-grid">
+            <div class="adv-item">
+              <span class="adv-label" data-i18n="packetLoss">فقدان الحزم</span>
+              <span class="adv-value tabular-nums" id="packetLossVal">—</span>
+            </div>
+            <div class="adv-item">
+              <span class="adv-label" data-i18n="minPing">أقل بنق</span>
+              <span class="adv-value tabular-nums" id="minPingVal">—</span>
+            </div>
+            <div class="adv-item">
+              <span class="adv-label" data-i18n="maxPing">أعلى بنق</span>
+              <span class="adv-value tabular-nums" id="maxPingVal">—</span>
+            </div>
+            <div class="adv-item">
+              <span class="adv-label" data-i18n="stdDevPing">الانحراف المعياري</span>
+              <span class="adv-value tabular-nums" id="stdDevPingVal">—</span>
+            </div>
+            <div class="adv-item">
+              <span class="adv-label" data-i18n="downloadStability">استقرار التحميل</span>
+              <span class="adv-value tabular-nums" id="downStabVal">—</span>
+            </div>
+            <div class="adv-item">
+              <span class="adv-label" data-i18n="uploadStability">استقرار الرفع</span>
+              <span class="adv-value tabular-nums" id="upStabVal">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="card recommendations" id="recommendations" style="display:none">
+        <h3 class="section-title" data-i18n="recommendations">توصيات</h3>
+        <div class="rec-grid" id="recGrid"></div>
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Install banner -->
+<div class="install-banner" id="installBanner" style="display:none">
+  <div class="install-banner-inner">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span data-i18n="installPrompt">ثبّت فحص السرعة كتطبيق على جهازك</span>
+    <button class="install-now-btn" id="installNowBtn" data-i18n="install">تثبيت</button>
+    <button class="install-close" id="installClose" aria-label="إغلاق">&times;</button>
+  </div>
+</div>
+
+<!-- Offline indicator -->
+<div class="offline-indicator" id="offlineIndicator" style="display:none" role="alert">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0119 12.55"/><path d="M5 12.55a11 11 0 015.17-2.39"/><path d="M10.71 5.05A16 16 0 0122.58 9"/><path d="M1.42 9a15.91 15.91 0 014.7-2.88"/><path d="M8.53 16.11a6 6 0 016.95 0"/><path d="M12 20h.01"/></svg>
+  <span data-i18n="offline">غير متصل — عرض السجل المحلي فقط</span>
+</div>
+
+<!-- Panels -->
+<div class="panel-overlay" id="panelOverlay" style="display:none"></div>
+
+<!-- History Panel -->
+<aside class="panel" id="historyPanel" role="dialog" aria-label="سجل الاختبارات" aria-hidden="true">
+  <div class="panel-header">
+    <h2 data-i18n="historyTitle">سجل الاختبارات</h2>
+    <button class="panel-close" data-close-panel aria-label="إغلاق">&times;</button>
+  </div>
+  <div class="panel-toolbar">
+    <select class="panel-select" id="historySort">
+      <option value="date" data-i18n="sortDate">الأحدث</option>
+      <option value="download" data-i18n="sortDownload">سرعة التحميل</option>
+      <option value="ping" data-i18n="sortPing">البنق</option>
+    </select>
+    <button class="btn-secondary" id="exportCsvBtn" data-i18n="exportCsv">تصدير CSV</button>
+    <button class="btn-danger-outline" id="clearHistoryBtn" data-i18n="clearAll">مسح الكل</button>
+  </div>
+  <div class="panel-body" id="historyList"></div>
+</aside>
+
+<!-- Analytics Panel -->
+<aside class="panel" id="analyticsPanel" role="dialog" aria-label="التحليلات" aria-hidden="true">
+  <div class="panel-header">
+    <h2 data-i18n="analytics">التحليلات</h2>
+    <button class="panel-close" data-close-panel aria-label="إغلاق">&times;</button>
+  </div>
+  <div class="panel-body" id="analyticsContent"></div>
+</aside>
+
+<!-- Compare Panel -->
+<aside class="panel panel-wide" id="comparePanel" role="dialog" aria-label="مقارنة" aria-hidden="true">
+  <div class="panel-header">
+    <h2 data-i18n="compare">مقارنة الاختبارات</h2>
+    <button class="panel-close" data-close-panel aria-label="إغلاق">&times;</button>
+  </div>
+  <div class="panel-body" id="compareContent">
+    <div class="compare-empty" id="compareEmpty">
+      <p data-i18n="compareHint">اختر 2-5 اختبارات من السجل للمقارنة</p>
+    </div>
+    <div class="compare-list" id="compareList"></div>
+    <div class="compare-results" id="compareResults" style="display:none"></div>
+  </div>
+</aside>
+
+<!-- Auth Modal -->
+<div class="modal" id="authModal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-content">
+    <button class="modal-close" data-close-modal aria-label="إغلاق">&times;</button>
+    <h2 id="authTitle" data-i18n="signIn">تسجيل الدخول</h2>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-auth-tab="login" data-i18n="signIn">تسجيل الدخول</button>
+      <button class="auth-tab" data-auth-tab="signup" data-i18n="signUp">إنشاء حساب</button>
+    </div>
+    <form id="authForm">
+      <div class="form-group">
+        <label for="authEmail" data-i18n="email">البريد الإلكتروني</label>
+        <input type="email" id="authEmail" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="authPassword" data-i18n="password">كلمة المرور</label>
+        <input type="password" id="authPassword" required minlength="6" autocomplete="current-password">
+      </div>
+      <div class="form-error" id="authError" style="display:none"></div>
+      <button type="submit" class="btn-primary btn-full" id="authSubmit" data-i18n="signIn">تسجيل الدخول</button>
+    </form>
+    <p class="auth-note" data-i18n="guestNote">التطبيق يعمل بالكامل بدون حساب. السجل يُحفظ محلياً.</p>
+  </div>
+</div>
+
+<!-- Settings Panel -->
+<aside class="panel" id="settingsPanel" role="dialog" aria-label="الإعدادات" aria-hidden="true">
+  <div class="panel-header">
+    <h2 data-i18n="settings">الإعدادات</h2>
+    <button class="panel-close" data-close-panel aria-label="إغلاق">&times;</button>
+  </div>
+  <div class="panel-body">
+    <div class="settings-group">
+      <h3 data-i18n="language">اللغة</h3>
+      <select class="setting-select" id="setLang">
+        <option value="ar">العربية</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <div class="settings-group">
+      <h3 data-i18n="theme">المظهر</h3>
+      <div class="theme-options">
+        <button class="theme-option" data-theme="dark"><span>🌙</span><span data-i18n="dark">داكن</span></button>
+        <button class="theme-option" data-theme="light"><span>☀️</span><span data-i18n="light">فاتح</span></button>
+        <button class="theme-option" data-theme="system"><span>💻</span><span data-i18n="system">تبع النظام</span></button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <h3 data-i18n="numerals">الأرقام</h3>
+      <select class="setting-select" id="setNumerals">
+        <option value="western" data-i18n="westernNumerals">أرقام غربية (123)</option>
+        <option value="arabic" data-i18n="arabicNumerals">أرقام عربية (١٢٣)</option>
+      </select>
+    </div>
+    <div class="settings-group">
+      <h3 data-i18n="units">الوحدة</h3>
+      <select class="setting-select" id="setUnits">
+        <option value="mbps">Mbps (ميجابت/ث)</option>
+        <option value="mibps">MiBps (ميجابايت/ث)</option>
+      </select>
+    </div>
+    <div class="settings-group">
+      <label class="toggle-row">
+        <span data-i18n="advancedMode">الوضع المتقدم</span>
+        <input type="checkbox" id="setAdvanced">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="settings-group">
+      <label class="toggle-row">
+        <span data-i18n="highContrast">تباين عالي</span>
+        <input type="checkbox" id="setHighContrast">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="settings-group">
+      <button class="btn-danger-outline btn-full" id="logoutBtn" style="display:none" data-i18n="signOut">تسجيل الخروج</button>
+    </div>
+    <div class="settings-group">
+      <button class="btn-danger-outline btn-full" id="deleteDataBtn" data-i18n="deleteData">حذف جميع البيانات المحلية</button>
+    </div>
+    <div class="settings-footer">
+      <p class="app-version">SpeedCheck v1.0.0</p>
+    </div>
+  </div>
+</aside>
+
+<!-- Share Modal -->
+<div class="modal" id="shareModal" style="display:none" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-content">
+    <button class="modal-close" data-close-modal aria-label="إغلاق">&times;</button>
+    <h2 data-i18n="shareResults">مشاركة النتائج</h2>
+    <div class="share-preview" id="sharePreview"></div>
+    <div class="share-options">
+      <button class="btn-primary btn-full" id="shareNativeBtn" data-i18n="shareApp">مشاركة عبر التطبيقات</button>
+      <button class="btn-secondary btn-full" id="shareCopyBtn" data-i18n="copyText">نسخ النص</button>
+      <button class="btn-secondary btn-full" id="shareImageBtn" data-i18n="saveImage">حفظ كصورة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite" style="display:none"></div>
+
+<!-- Confetti container -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script src="/js/i18n.js"></script>
+<script src="/js/storage.js"></script>
+<script src="/js/gauge.js"></script>
+<script src="/js/chart.js"></script>
+<script src="/js/speedtest.js"></script>
+<script src="/js/history.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/settings.js"></script>
+<script src="/js/pwa.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
