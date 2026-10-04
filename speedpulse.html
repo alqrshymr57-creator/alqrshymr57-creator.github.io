@@ -1,0 +1,1949 @@
+<!doctype html>
+<html lang="en" dir="auto" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0e27" id="themeColorMeta">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="A beautifully clear, privacy-minded internet speed test. Measure download, upload, and latency with SpeedPulse.">
+  <title>SpeedPulse — Internet Speed Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link id="manifestLink" rel="manifest">
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0a0e27;
+      --bg-deep: #070a1b;
+      --surface: rgba(16, 22, 51, .72);
+      --surface-strong: rgba(20, 27, 61, .88);
+      --surface-soft: rgba(255, 255, 255, .035);
+      --line: rgba(153, 177, 236, .14);
+      --line-strong: rgba(153, 177, 236, .23);
+      --text: #f5f7ff;
+      --muted: #a1accb;
+      --muted-2: #7280a5;
+      --cyan: #00d4ff;
+      --purple: #7b2ff7;
+      --green: #00ff88;
+      --red: #ff4444;
+      --orange: #ff8800;
+      --yellow: #ffdd00;
+      --shadow: 0 22px 70px rgba(0, 0, 0, .28);
+      --glass-blur: blur(22px);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --meter-color: #ff4444;
+      --page-width: 1290px;
+    }
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --bg: #f2f6ff;
+      --bg-deep: #eaf0fc;
+      --surface: rgba(255, 255, 255, .72);
+      --surface-strong: rgba(255, 255, 255, .91);
+      --surface-soft: rgba(20, 41, 93, .035);
+      --line: rgba(35, 59, 112, .12);
+      --line-strong: rgba(35, 59, 112, .2);
+      --text: #101a38;
+      --muted: #566483;
+      --muted-2: #7885a2;
+      --cyan: #007fae;
+      --purple: #6034cc;
+      --green: #008d5a;
+      --red: #d63743;
+      --orange: #c96500;
+      --yellow: #a27900;
+      --shadow: 0 22px 70px rgba(35, 57, 112, .12);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 94px; }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      background:
+        radial-gradient(ellipse at 50% -18%, rgba(0, 212, 255, .105), transparent 40%),
+        radial-gradient(ellipse at 95% 34%, rgba(123, 47, 247, .085), transparent 36%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color .3s ease, color .3s ease;
+    }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { color: inherit; font: inherit; }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--cyan); outline-offset: 4px; }
+    a { color: inherit; }
+    [hidden] { display: none !important; }
+    .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+    .icon { width: 20px; height: 20px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-sm { width: 16px; height: 16px; }
+    .skip-link {
+      position: fixed; inset-inline-start: 12px; top: 12px; z-index: 99;
+      padding: 12px 16px; border-radius: 12px; background: var(--text); color: var(--bg);
+      transform: translateY(-160%); transition: transform .2s ease;
+    }
+    .skip-link:focus { transform: translateY(0); }
+    #ambientCanvas, .ambient-grid { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    #ambientCanvas { z-index: 0; opacity: .68; }
+    .ambient-grid {
+      z-index: 0;
+      opacity: .15;
+      background-image: linear-gradient(rgba(141, 168, 230, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(141, 168, 230, .055) 1px, transparent 1px);
+      background-size: 68px 68px;
+      mask-image: linear-gradient(to bottom, black, transparent 79%);
+    }
+    :root[data-theme="light"] .ambient-grid { opacity: .22; }
+    .site-header, main, .site-footer { position: relative; z-index: 1; }
+    .site-header {
+      position: sticky; top: 0; z-index: 30;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg) 76%, transparent);
+      -webkit-backdrop-filter: blur(22px); backdrop-filter: blur(22px);
+      transition: background .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+    .site-header.is-scrolled { box-shadow: 0 12px 34px rgba(0,0,0,.14); border-color: var(--line-strong); }
+    .header-inner {
+      width: min(100% - 44px, 1440px); min-height: 76px; margin-inline: auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 22px;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; white-space: nowrap; font-weight: 800; letter-spacing: -.055em; font-size: 19px; }
+    .brand-bolt { color: var(--cyan); font-size: 25px; line-height: 1; filter: drop-shadow(0 0 9px rgba(0,212,255,.78)); }
+    .brand-word { background: linear-gradient(100deg, var(--text) 8%, #aef2ff 45%, #c7a2ff 95%); color: transparent; background-clip: text; -webkit-background-clip: text; }
+    :root[data-theme="light"] .brand-word { background-image: linear-gradient(100deg, #172448 8%, #007fae 55%, #6034cc 100%); }
+    .header-nav { display: flex; align-items: center; gap: clamp(18px, 3vw, 38px); margin-inline-start: auto; margin-inline-end: 16px; }
+    .header-nav a { position: relative; padding-block: 10px; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600; transition: color .2s ease; }
+    .header-nav a::after { content: ""; position: absolute; inset-inline: 0; bottom: 2px; height: 2px; background: linear-gradient(90deg, var(--cyan), var(--purple)); transform: scaleX(0); transform-origin: left; transition: transform .22s ease; border-radius: 4px; }
+    .header-nav a:hover, .header-nav a:focus-visible { color: var(--text); }
+    .header-nav a:hover::after { transform: scaleX(1); }
+    .header-actions { display: flex; align-items: center; gap: 9px; }
+    .icon-button, .install-button, .quiet-button, .share-button, .clear-button, .start-button, .modal-button {
+      border: 0; cursor: pointer; transition: transform .2s ease, background .25s ease, border-color .25s ease, box-shadow .25s ease, color .25s ease, opacity .2s ease;
+    }
+    .icon-button {
+      position: relative; display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid var(--line);
+      border-radius: 14px; background: var(--surface-soft); color: var(--muted); backdrop-filter: blur(12px);
+    }
+    .icon-button:hover { color: var(--cyan); border-color: rgba(0,212,255,.42); background: rgba(0,212,255,.08); transform: translateY(-2px); }
+    .icon-button[aria-pressed="true"] { color: var(--cyan); border-color: rgba(0,212,255,.38); }
+    .install-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 15px;
+      border: 1px solid rgba(0,212,255,.34); border-radius: 14px; background: linear-gradient(115deg, rgba(0,212,255,.14), rgba(123,47,247,.13));
+      color: var(--text); font-size: 12px; font-weight: 700; letter-spacing: .015em; white-space: nowrap;
+      box-shadow: inset 0 1px rgba(255,255,255,.06);
+    }
+    .install-button .icon { color: var(--cyan); }
+    .install-button:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,212,255,.16); border-color: rgba(0,212,255,.6); }
+    .container { width: min(100% - 48px, var(--page-width)); margin-inline: auto; }
+    .hero-section { padding-block: clamp(42px, 7vw, 86px) 26px; }
+    .hero-copy { max-width: 780px; margin: 0 auto 31px; text-align: center; }
+    .eyebrow {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 17px;
+      color: var(--cyan); font-size: 10px; line-height: 1.4; font-weight: 800; letter-spacing: .19em; text-transform: uppercase;
+    }
+    .eyebrow::before, .eyebrow::after { content: ""; display: block; width: 22px; height: 1px; background: linear-gradient(90deg, transparent, currentColor); opacity: .7; }
+    .eyebrow::after { transform: rotate(180deg); }
+    h1, h2, h3, p { margin-top: 0; }
+    .hero-copy h1 { margin: 0; font-size: clamp(34px, 5.4vw, 65px); line-height: 1.055; letter-spacing: -.065em; font-weight: 700; }
+    .hero-copy h1 .gradient-word { background: linear-gradient(95deg, #43e8ff 5%, #9c70ff 72%, #c7b4ff 100%); color: transparent; background-clip: text; -webkit-background-clip: text; }
+    :root[data-theme="light"] .hero-copy h1 .gradient-word { background-image: linear-gradient(95deg, #007fae 5%, #6034cc 90%); }
+    .hero-copy p { max-width: 560px; margin: 17px auto 0; color: var(--muted); font-size: 15px; line-height: 1.75; }
+    .glass-card { border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow), inset 0 1px rgba(255,255,255,.035); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
+    .test-console {
+      position: relative; isolation: isolate; overflow: hidden; padding: 17px clamp(16px, 2.6vw, 34px) 22px;
+      border-radius: var(--radius-xl); border-color: rgba(114, 156, 224, .2);
+    }
+    .test-console::before {
+      content: ""; position: absolute; inset: -1px; z-index: -1; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 38%, rgba(0,212,255,.085), transparent 37%), radial-gradient(ellipse at 100% 0%, rgba(123,47,247,.12), transparent 35%);
+    }
+    .console-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 2px 14px; border-bottom: 1px solid var(--line); }
+    .console-mark, .console-top-meta, .online-status, .mini-label { display: inline-flex; align-items: center; gap: 8px; }
+    .console-mark { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .17em; }
+    .console-mark .icon { color: var(--cyan); width: 17px; height: 17px; }
+    .console-top-meta { color: var(--muted-2); font: 600 9px/1 Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+    .online-status { color: var(--muted); letter-spacing: .07em; }
+    .online-dot, .status-dot, .live-dot { width: 7px; height: 7px; display: inline-block; flex: 0 0 auto; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px rgba(0,255,136,.6); }
+    .online-status.is-offline { color: #ff8b8b; }
+    .online-status.is-offline .online-dot { background: #ff555f; box-shadow: 0 0 10px rgba(255,68,68,.55); }
+    .console-grid { display: grid; grid-template-columns: minmax(0,1fr); align-items: center; gap: 18px; padding-block: 22px 24px; }
+    .center-stage { grid-row: 1; display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; }
+    .telemetry-rail { grid-row: 2; }
+    .sequence-rail { grid-row: 3; }
+    .rail-card { height: 100%; min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 19px; background: linear-gradient(145deg, rgba(255,255,255,.038), rgba(255,255,255,.012)); }
+    :root[data-theme="light"] .rail-card { background: linear-gradient(145deg, rgba(255,255,255,.8), rgba(245,248,255,.55)); }
+    .rail-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 18px; color: var(--muted); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; font-weight: 800; }
+    .rail-title .icon { color: var(--cyan); width: 17px; height: 17px; }
+    .signal-main { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .signal-orb { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid rgba(0,212,255,.22); border-radius: 15px; background: rgba(0,212,255,.08); color: var(--cyan); }
+    .signal-orb .icon { width: 22px; height: 22px; }
+    .signal-copy { min-width: 0; }
+    .signal-copy strong { display: block; max-width: 180px; overflow: hidden; color: var(--text); font-size: 16px; line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
+    .signal-copy span { display: block; margin-top: 4px; color: var(--muted-2); font-size: 10px; }
+    .signal-bars { display: flex; align-items: flex-end; gap: 4px; height: 30px; margin: 15px 0 13px; }
+    .signal-bars span { width: 6px; height: calc(9px + var(--bar) * 5px); border-radius: 6px; background: linear-gradient(180deg, var(--cyan), rgba(0,212,255,.18)); opacity: .48; }
+    .signal-bars span:nth-child(-n+3) { opacity: .95; box-shadow: 0 0 8px rgba(0,212,255,.3); }
+    .rail-divider { height: 1px; margin-block: 14px; background: var(--line); }
+    .rail-stat-line { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 10px; }
+    .rail-stat-line + .rail-stat-line { margin-top: 9px; }
+    .rail-stat-line strong { color: var(--text); text-align: end; font-weight: 600; }
+    .rail-note { margin: 13px 0 0; color: var(--muted-2); font-size: 10px; line-height: 1.6; }
+    .center-kicker { display: flex; align-items: center; gap: 8px; margin: 0 0 7px; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+    .center-kicker .live-dot { width: 6px; height: 6px; }
+    .meter-wrap { position: relative; width: min(76vw, 292px); aspect-ratio: 1; margin: 1px 0 0; display: grid; place-items: center; }
+    .meter-halo { position: absolute; inset: 7%; border-radius: 50%; background: radial-gradient(circle, rgba(0,212,255,.105), rgba(123,47,247,.038) 45%, transparent 70%); filter: blur(12px); opacity: .88; transition: background .3s ease; }
+    .meter-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; transform: rotate(-90deg); }
+    .meter-outline { fill: none; stroke: var(--line-strong); stroke-width: .7; }
+    .meter-dots { fill: none; stroke: rgba(149,172,221,.25); stroke-width: 1.5; stroke-dasharray: 1 8; }
+    .meter-track { fill: none; stroke: rgba(135,160,213,.11); stroke-width: 7; }
+    .meter-gradient-ring { fill: none; stroke: url(#meterGradient); stroke-width: 1.5; opacity: .78; stroke-dasharray: 3 9; }
+    .meter-arc { fill: none; stroke: var(--meter-color); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 622.035; stroke-dashoffset: 622.035; filter: drop-shadow(0 0 5px var(--meter-color)) drop-shadow(0 0 13px color-mix(in srgb, var(--meter-color) 55%, transparent)); transition: stroke .35s ease, filter .35s ease; }
+    .meter-inner-ring { fill: none; stroke: rgba(144,166,218,.12); stroke-width: 1; stroke-dasharray: 2 7; }
+    .gauge-center { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 67%; height: 67%; }
+    .meter-label { margin: 0 0 5px; color: var(--muted-2); font-size: 9px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+    .speed-number { display: block; max-width: 100%; color: var(--text); font-family: Orbitron, ui-monospace, monospace; font-size: clamp(39px, 6.2vw, 61px); font-weight: 600; line-height: 1.14; letter-spacing: -.06em; font-variant-numeric: tabular-nums; text-shadow: 0 0 22px rgba(0,212,255,.16); }
+    .speed-unit { margin-top: 3px; color: var(--muted); font-family: Orbitron, ui-monospace, monospace; font-size: 11px; letter-spacing: .13em; }
+    .meter-scale { width: min(100%, 250px); display: flex; justify-content: space-between; margin: -2px 0 13px; color: var(--muted-2); font: 600 9px/1 Inter, sans-serif; letter-spacing: .04em; }
+    .status-line { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 23px; color: var(--text); font-size: 13px; font-weight: 700; }
+    .status-dot { width: 7px; height: 7px; background: var(--muted-2); box-shadow: none; }
+    .status-dot.is-active { background: var(--cyan); box-shadow: 0 0 11px rgba(0,212,255,.75); animation: blink 1.1s ease-in-out infinite; }
+    .status-dot.is-success { background: var(--green); box-shadow: 0 0 11px rgba(0,255,136,.7); }
+    .status-dot.is-estimate { background: var(--yellow); box-shadow: 0 0 10px rgba(255,221,0,.42); }
+    .status-detail { min-height: 17px; margin: 3px 0 13px; color: var(--muted-2); font-size: 10px; line-height: 1.5; }
+    .button-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .start-button {
+      position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      min-width: 210px; min-height: 54px; padding: 0 28px; overflow: hidden; border: 1px solid rgba(255,255,255,.2); border-radius: 100px;
+      background: linear-gradient(105deg, #05c9ee 0%, #11aef6 40%, #7848ef 100%); color: #061124;
+      box-shadow: 0 9px 30px rgba(0,166,230,.23), inset 0 1px rgba(255,255,255,.42);
+      font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase;
+      animation: idleGlow 2.8s ease-in-out infinite;
+    }
+    .start-button::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,.28) 50%, transparent 75%); transform: translateX(-110%); transition: transform .65s ease; }
+    .start-button:hover:not(:disabled) { transform: translateY(-2px) scale(1.015); box-shadow: 0 13px 35px rgba(0,166,230,.36), inset 0 1px rgba(255,255,255,.42); }
+    .start-button:hover:not(:disabled)::before { transform: translateX(110%); }
+    .start-button:active:not(:disabled) { transform: translateY(0) scale(.985); }
+    .start-button:disabled { cursor: wait; opacity: .92; animation: none; }
+    .start-button.is-testing { background: linear-gradient(105deg, #34dbf4, #a276ff); }
+    .start-button.is-complete { background: linear-gradient(105deg, #4ce8b0, #32bff1 55%, #8172ff); }
+    .start-button .icon { position: relative; z-index: 1; width: 17px; height: 17px; }
+    .start-button span { position: relative; z-index: 1; }
+    .button-spinner { width: 16px; height: 16px; border: 2px solid rgba(5,17,36,.25); border-top-color: #061124; border-radius: 50%; animation: spin .7s linear infinite; }
+    .share-button { display: grid; place-items: center; width: 52px; height: 52px; border: 1px solid var(--line-strong); border-radius: 50%; color: var(--cyan); background: var(--surface-soft); }
+    .share-button:hover { transform: translateY(-2px); border-color: rgba(0,212,255,.48); background: rgba(0,212,255,.09); }
+    .keyboard-hint { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 13px; color: var(--muted-2); font-size: 9px; }
+    .keyboard-hint kbd { display: inline-grid; place-items: center; min-width: 20px; height: 19px; padding: 0 5px; border: 1px solid var(--line-strong); border-radius: 5px; color: var(--muted); font: 600 9px Inter, sans-serif; }
+    .sequence-list { position: relative; display: grid; gap: 15px; margin: 0; padding: 0; list-style: none; }
+    .sequence-list::before { content: ""; position: absolute; inset-block: 15px; inset-inline-start: 12px; width: 1px; background: linear-gradient(var(--line-strong), transparent); }
+    .sequence-step { position: relative; display: flex; align-items: flex-start; gap: 11px; min-width: 0; }
+    .step-bullet { position: relative; z-index: 1; display: grid; place-items: center; width: 25px; height: 25px; flex: 0 0 25px; border: 1px solid var(--line-strong); border-radius: 9px; color: var(--muted-2); background: var(--bg); font: 700 9px Orbitron, monospace; transition: all .25s ease; }
+    .sequence-step.is-active .step-bullet { color: var(--cyan); border-color: rgba(0,212,255,.65); box-shadow: 0 0 14px rgba(0,212,255,.2); background: rgba(0,212,255,.08); }
+    .sequence-step.is-done .step-bullet { color: #061124; border-color: var(--green); background: var(--green); box-shadow: 0 0 10px rgba(0,255,136,.28); }
+    .sequence-step.is-done .step-bullet .icon { width: 14px; height: 14px; stroke-width: 2.4; }
+    .step-copy { padding-top: 1px; min-width: 0; }
+    .step-copy strong { display: block; color: var(--text); font-size: 11px; font-weight: 700; }
+    .step-copy span { display: block; margin-top: 4px; color: var(--muted-2); font-size: 9px; line-height: 1.4; }
+    .profile-chip { display: flex; align-items: center; gap: 9px; margin-top: 17px; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); color: var(--muted); font-size: 9px; line-height: 1.5; }
+    .profile-chip .icon { width: 16px; height: 16px; color: var(--purple); }
+    .console-footer { display: flex; align-items: center; gap: 13px; padding-top: 15px; border-top: 1px solid var(--line); }
+    .progress-label { flex: 0 0 auto; color: var(--muted-2); font: 700 9px/1 Inter, sans-serif; letter-spacing: .11em; text-transform: uppercase; }
+    .progress-track { position: relative; height: 4px; flex: 1; overflow: hidden; border-radius: 100px; background: rgba(125,150,206,.13); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--cyan), var(--purple)); box-shadow: 0 0 10px rgba(0,212,255,.4); transition: width .3s ease; }
+    .progress-percent { min-width: 28px; color: var(--muted-2); text-align: end; font: 700 9px Orbitron, monospace; }
+    .stats-section, .network-section, .history-section, .about-section { padding-block: clamp(54px, 7vw, 88px) 0; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 21px; }
+    .section-heading .eyebrow { margin-bottom: 10px; }
+    .section-heading h2 { margin: 0; font-size: clamp(23px, 3vw, 32px); letter-spacing: -.045em; line-height: 1.2; }
+    .section-heading p { max-width: 440px; margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .stats-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .stat-card { position: relative; overflow: hidden; min-height: 151px; padding: 19px; border-radius: 21px; transition: transform .25s ease, border-color .25s ease, background .3s ease; }
+    .stat-card::after { content: ""; position: absolute; width: 140px; height: 140px; inset-inline-end: -60px; top: -70px; border-radius: 50%; background: var(--stat-glow, rgba(0,212,255,.12)); filter: blur(25px); opacity: .56; pointer-events: none; }
+    .stat-card:hover { transform: translateY(-4px); border-color: var(--line-strong); }
+    .stat-card[data-stat="download"] { --stat-glow: rgba(0,212,255,.18); --stat-color: var(--cyan); }
+    .stat-card[data-stat="upload"] { --stat-glow: rgba(123,47,247,.22); --stat-color: #a781ff; }
+    .stat-card[data-stat="ping"] { --stat-glow: rgba(0,255,136,.14); --stat-color: var(--green); }
+    .stat-top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .stat-label-wrap { display: flex; align-items: center; gap: 10px; }
+    .stat-icon { display: grid; place-items: center; width: 35px; height: 35px; border: 1px solid color-mix(in srgb, var(--stat-color) 29%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--stat-color) 11%, transparent); color: var(--stat-color); }
+    .stat-icon .icon { width: 18px; height: 18px; }
+    .stat-label { color: var(--muted); font-size: 11px; font-weight: 700; }
+    .stat-live { display: inline-flex; align-items: center; gap: 5px; color: var(--muted-2); font-size: 8px; letter-spacing: .1em; text-transform: uppercase; }
+    .stat-live::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--stat-color); opacity: .8; }
+    .stat-value-row { position: relative; z-index: 1; display: flex; align-items: baseline; gap: 7px; margin: 17px 0 12px 45px; }
+    .stat-value { color: var(--text); font-family: Orbitron, ui-monospace, monospace; font-size: clamp(27px, 4vw, 34px); font-weight: 600; letter-spacing: -.055em; font-variant-numeric: tabular-nums; }
+    .stat-unit { color: var(--muted-2); font-size: 10px; font-weight: 700; }
+    .stat-meta { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; color: var(--muted-2); font-size: 9px; }
+    .stat-bar { height: 3px; overflow: hidden; border-radius: 5px; background: rgba(140,163,210,.14); }
+    .stat-bar span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--stat-color), color-mix(in srgb, var(--stat-color) 48%, var(--purple))); box-shadow: 0 0 10px color-mix(in srgb, var(--stat-color) 45%, transparent); transition: width .6s cubic-bezier(.2,.7,.25,1); }
+    .network-card { overflow: hidden; border-radius: 22px; }
+    .network-card-head { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 18px 21px; border-bottom: 1px solid var(--line); }
+    .network-card-head h3 { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 13px; font-weight: 700; }
+    .network-card-head h3 .icon { color: var(--cyan); width: 18px; height: 18px; }
+    .network-card-head > span { color: var(--muted-2); font-size: 9px; }
+    .network-info-grid { display: grid; grid-template-columns: 1fr; }
+    .network-info { position: relative; min-width: 0; padding: 19px 21px; }
+    .network-info + .network-info { border-top: 1px solid var(--line); }
+    .network-info-label { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; color: var(--muted-2); font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .network-info-label .icon { width: 15px; height: 15px; color: var(--purple); }
+    .network-info strong { display: block; overflow: hidden; color: var(--text); font-size: 13px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .network-info p { min-height: 14px; margin: 5px 0 0; overflow: hidden; color: var(--muted-2); font-size: 10px; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+    .skeleton { color: transparent !important; border-radius: 5px; background: linear-gradient(90deg, var(--surface-soft), rgba(125,150,205,.17), var(--surface-soft)); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+    .small-link-button { border: 0; padding: 0; background: none; color: var(--cyan); cursor: pointer; font-size: 10px; font-weight: 700; }
+    .small-link-button:hover { text-decoration: underline; }
+    .history-section { padding-bottom: 0; }
+    .history-heading { align-items: center; }
+    .history-count { display: inline-flex; align-items: center; gap: 6px; margin-inline-start: 10px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 100px; color: var(--muted); font-size: 9px; font-weight: 700; vertical-align: middle; }
+    .clear-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); color: var(--muted); font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .clear-button:hover:not(:disabled) { color: #ff777e; border-color: rgba(255,68,68,.35); background: rgba(255,68,68,.07); }
+    .clear-button:disabled { opacity: .45; cursor: not-allowed; }
+    .history-list { display: grid; gap: 10px; }
+    .history-entry { display: grid; grid-template-columns: minmax(0,1fr); gap: 14px; align-items: center; padding: 16px; border-radius: 18px; transition: transform .2s ease, border-color .2s ease; animation: riseIn .45s both; }
+    .history-entry:hover { transform: translateY(-2px); border-color: var(--line-strong); }
+    .history-entry-date { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .history-entry-date .icon { color: var(--muted-2); width: 17px; height: 17px; }
+    .history-entry-date time { overflow: hidden; color: var(--text); font-size: 11px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+    .history-badge { margin-inline-start: auto; padding: 4px 7px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted-2); font-size: 8px; font-weight: 800; letter-spacing: .1em; }
+    .history-badge.is-live { color: var(--green); border-color: rgba(0,255,136,.25); background: rgba(0,255,136,.06); }
+    .history-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .history-metric { min-width: 0; }
+    .history-metric span { display: block; margin-bottom: 4px; color: var(--muted-2); font-size: 8px; text-transform: uppercase; letter-spacing: .09em; }
+    .history-metric strong { display: block; color: var(--text); font: 600 12px Orbitron, ui-monospace, monospace; white-space: nowrap; }
+    .delete-entry { display: grid; place-items: center; width: 36px; height: 36px; justify-self: end; border: 1px solid transparent; border-radius: 11px; background: transparent; color: var(--muted-2); cursor: pointer; transition: all .2s ease; }
+    .delete-entry:hover { color: #ff6871; border-color: rgba(255,68,68,.25); background: rgba(255,68,68,.07); }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 245px; padding: 28px; border: 1px dashed var(--line-strong); border-radius: 22px; background: rgba(255,255,255,.012); text-align: center; }
+    .empty-illustration { display: grid; place-items: center; width: 67px; height: 67px; margin-bottom: 17px; border: 1px solid rgba(0,212,255,.17); border-radius: 22px; background: radial-gradient(circle at 30% 20%, rgba(0,212,255,.15), rgba(123,47,247,.09)); color: var(--cyan); box-shadow: 0 0 35px rgba(0,212,255,.08); }
+    .empty-illustration .icon { width: 29px; height: 29px; }
+    .empty-state h3 { margin: 0 0 7px; font-size: 14px; }
+    .empty-state p { max-width: 350px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+    .about-section { padding-bottom: clamp(55px, 7vw, 88px); }
+    .about-grid { display: grid; grid-template-columns: 1fr; gap: 13px; }
+    .about-card { min-height: 155px; padding: 20px; border-radius: 19px; transition: transform .22s ease, border-color .22s ease; }
+    .about-card:hover { transform: translateY(-3px); border-color: var(--line-strong); }
+    .about-icon { display: grid; place-items: center; width: 35px; height: 35px; margin-bottom: 15px; border: 1px solid rgba(123,47,247,.25); border-radius: 12px; background: rgba(123,47,247,.08); color: #a781ff; }
+    .about-icon .icon { width: 18px; height: 18px; }
+    .about-card h3 { margin: 0 0 7px; font-size: 12px; }
+    .about-card p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.75; }
+    .site-footer { padding: 20px 0 calc(24px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(5,8,23,.12); }
+    :root[data-theme="light"] .site-footer { background: rgba(255,255,255,.23); }
+    .footer-inner { display: flex; flex-direction: column; align-items: center; gap: 15px; text-align: center; }
+    .footer-copy { color: var(--muted-2); font-size: 10px; line-height: 1.7; }
+    .footer-copy strong { color: var(--muted); font-weight: 600; }
+    .footer-social { display: flex; align-items: center; gap: 8px; }
+    .footer-social a { display: grid; place-items: center; width: 35px; height: 35px; border: 1px solid var(--line); border-radius: 11px; color: var(--muted); text-decoration: none; transition: all .2s ease; }
+    .footer-social a:hover { color: var(--cyan); border-color: rgba(0,212,255,.38); transform: translateY(-2px); }
+    .footer-social .icon { width: 15px; height: 15px; }
+    .toast { position: fixed; z-index: 80; inset-inline: 16px; bottom: calc(18px + env(safe-area-inset-bottom)); width: max-content; max-width: min(440px, calc(100% - 32px)); margin-inline: auto; padding: 13px 17px; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--surface-strong); color: var(--text); box-shadow: var(--shadow); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); font-size: 11px; line-height: 1.5; opacity: 0; pointer-events: none; transform: translateY(13px); transition: all .25s ease; }
+    .toast.is-visible { opacity: 1; transform: translateY(0); }
+    .confetti-layer { position: fixed; inset: 0; z-index: 70; overflow: hidden; pointer-events: none; }
+    .confetti-piece { position: absolute; top: -16px; width: 7px; height: 12px; border-radius: 2px; opacity: 0; animation: confettiFall var(--duration, 1.8s) cubic-bezier(.14,.56,.25,1) var(--delay, 0s) both; }
+    dialog { width: min(440px, calc(100% - 30px)); max-width: none; max-height: min(90dvh, 690px); overflow: auto; padding: 0; border: 1px solid var(--line-strong); border-radius: 25px; background: var(--bg-deep); color: var(--text); box-shadow: 0 32px 100px rgba(0,0,0,.42); }
+    dialog::backdrop { background: rgba(3,5,17,.68); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    .modal-content { padding: 24px; }
+    .modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+    .modal-header h2 { margin: 0; font-size: 21px; letter-spacing: -.04em; }
+    .modal-header p { margin: 7px 0 0; color: var(--muted); font-size: 11px; line-height: 1.65; }
+    .modal-close { display: grid; place-items: center; width: 35px; height: 35px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-soft); color: var(--muted); cursor: pointer; }
+    .app-preview { display: flex; align-items: center; gap: 14px; margin: 22px 0; padding: 16px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); }
+    .app-preview img { width: 55px; height: 55px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,212,255,.15); }
+    .app-preview strong { display: block; font-size: 12px; }
+    .app-preview span { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; }
+    .pwa-note { margin: 0 0 18px; padding: 12px 13px; border-inline-start: 2px solid var(--yellow); border-radius: 0 10px 10px 0; background: rgba(255,221,0,.06); color: var(--muted); font-size: 10px; line-height: 1.7; }
+    :root[data-theme="light"] .pwa-note { background: rgba(162,121,0,.07); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 9px; }
+    .modal-button { min-height: 43px; padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); color: var(--muted); font-size: 11px; font-weight: 700; }
+    .modal-button:hover { border-color: var(--line-strong); color: var(--text); }
+    .modal-button.primary { border-color: rgba(0,212,255,.35); background: linear-gradient(110deg, rgba(0,212,255,.19), rgba(123,47,247,.17)); color: var(--text); }
+    .modal-button.danger { color: #ff7d82; border-color: rgba(255,68,68,.26); background: rgba(255,68,68,.08); }
+    .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .65s ease, transform .65s cubic-bezier(.2,.75,.25,1); }
+    .js .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: .08s !important; }
+    .reveal-delay-2 { transition-delay: .16s !important; }
+    .reveal-delay-3 { transition-delay: .24s !important; }
+    .js .stats-section .stat-card { opacity: 0; transform: translateY(12px); }
+    .js .stats-section.is-visible .stat-card { animation: riseIn .48s both; }
+    .js .stats-section.is-visible .stat-card:nth-child(2) { animation-delay: .09s; }
+    .js .stats-section.is-visible .stat-card:nth-child(3) { animation-delay: .18s; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes blink { 50% { opacity: .45; box-shadow: 0 0 3px rgba(0,212,255,.35); } }
+    @keyframes idleGlow { 0%,100% { box-shadow: 0 9px 28px rgba(0,166,230,.2), inset 0 1px rgba(255,255,255,.42); } 50% { box-shadow: 0 9px 38px rgba(0,166,230,.4), 0 0 20px rgba(123,47,247,.18), inset 0 1px rgba(255,255,255,.42); } }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    @keyframes riseIn { from { opacity: 0; transform: translateY(13px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes confettiFall { 0% { opacity: 0; transform: translate3d(0,0,0) rotate(0); } 8% { opacity: 1; } 100% { opacity: 0; transform: translate3d(var(--dx, 0), 105vh, 0) rotate(var(--rot, 520deg)); } }
+    @media (min-width: 480px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .stat-card:last-child { grid-column: 1 / -1; }
+      .network-info-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .network-info:nth-child(2) { border-top: 0; }
+      .network-info:nth-child(odd) { border-inline-end: 1px solid var(--line); }
+      .about-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .about-card:last-child { grid-column: 1 / -1; }
+      .footer-inner { flex-direction: row; justify-content: space-between; text-align: start; }
+    }
+    @media (min-width: 768px) {
+      .container { width: min(100% - 64px, var(--page-width)); }
+      .console-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 17px; }
+      .center-stage { grid-column: 1 / -1; grid-row: 1; }
+      .telemetry-rail { grid-column: 1; grid-row: 2; }
+      .sequence-rail { grid-column: 2; grid-row: 2; }
+      .rail-card { padding: 20px; }
+      .history-entry { grid-template-columns: minmax(160px,1fr) minmax(220px,1.2fr) 38px; gap: 18px; padding: 14px 18px; }
+      .stats-grid { gap: 16px; }
+      .about-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .about-card:last-child { grid-column: auto; }
+    }
+    @media (min-width: 1024px) {
+      .console-grid { grid-template-columns: minmax(190px,.78fr) minmax(320px,1.24fr) minmax(190px,.78fr); gap: clamp(14px, 2vw, 28px); min-height: 380px; }
+      .center-stage { grid-column: 2; grid-row: 1; }
+      .telemetry-rail { grid-column: 1; grid-row: 1; }
+      .sequence-rail { grid-column: 3; grid-row: 1; }
+      .meter-wrap { width: clamp(245px, 24vw, 285px); }
+      .stats-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .stat-card:last-child { grid-column: auto; }
+      .network-info-grid { grid-template-columns: repeat(4, minmax(0,1fr)); }
+      .history-entry { grid-template-columns: minmax(205px,1.05fr) minmax(300px,1.4fr) 38px; }
+    }
+    @media (min-width: 1200px) {
+      .hero-section { padding-top: 76px; }
+      .console-grid { min-height: 405px; }
+      .rail-card { padding: 21px; }
+      .meter-wrap { width: 294px; }
+      .network-info-grid { grid-template-columns: repeat(5, minmax(0,1fr)); }
+      .network-info:nth-child(n) { border-top: 0; }
+      .network-info:nth-child(odd) { border-inline-end: 0; }
+      .network-info:not(:last-child) { border-inline-end: 1px solid var(--line); }
+    }
+    @media (min-width: 1440px) {
+      :root { --page-width: 1340px; }
+      .test-console { padding-inline: 38px; }
+    }
+    @media (max-width: 767px) {
+      .header-inner { width: min(100% - 28px, 1440px); min-height: 67px; gap: 11px; flex-wrap: wrap; padding-block: 7px 3px; row-gap: 3px; }
+      .brand { order: 1; font-size: 17px; }
+      .brand-bolt { font-size: 23px; }
+      .header-nav { display: flex; order: 3; flex: 0 0 100%; justify-content: center; gap: clamp(25px, 8vw, 42px); margin: 0; padding-block: 1px 5px; }
+      .header-nav a { padding-block: 5px; font-size: 11px; }
+      .header-actions { order: 2; margin-inline-start: auto; gap: 6px; }
+      .icon-button { width: 39px; height: 39px; border-radius: 12px; }
+      .install-button { min-height: 39px; padding-inline: 11px; border-radius: 12px; font-size: 10px; }
+      .install-button .icon { width: 17px; height: 17px; }
+      .container { width: min(100% - 32px, var(--page-width)); }
+      .hero-section { padding-block: 43px 20px; }
+      .hero-copy { margin-bottom: 24px; }
+      .hero-copy p { font-size: 13px; }
+      .test-console { padding: 14px 13px 17px; border-radius: 24px; }
+      .console-topbar { padding-bottom: 12px; }
+      .console-top-meta { font-size: 8px; }
+      .console-grid { gap: 13px; padding-block: 19px; }
+      .rail-card { padding: 16px; }
+      .sequence-list { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
+      .sequence-list::before { display: none; }
+      .sequence-step { gap: 7px; }
+      .step-bullet { width: 23px; height: 23px; flex-basis: 23px; }
+      .step-copy strong { font-size: 10px; }
+      .step-copy span { font-size: 8px; }
+      .profile-chip { margin-top: 13px; }
+      .section-heading { align-items: flex-start; }
+      .section-heading > p { display: none; }
+      .network-card-head { padding: 16px; }
+      .network-info { padding: 16px; }
+      .history-heading { align-items: center; }
+      .history-entry { grid-template-columns: minmax(0,1fr) 38px; }
+      .history-metrics { grid-column: 1 / -1; grid-row: 2; }
+      .delete-entry { grid-column: 2; grid-row: 1; }
+    }
+    @media (max-width: 480px) {
+      .container { width: min(100% - 28px, var(--page-width)); }
+      .header-inner { width: min(100% - 22px, 1440px); }
+      .header-actions { gap: 5px; }
+      .icon-button { width: 36px; height: 36px; }
+      .install-button { width: 38px; min-width: 38px; padding: 0; }
+      .install-label { display: none; }
+      .hero-section { padding-top: 36px; }
+      .hero-copy h1 { font-size: clamp(33px, 9.3vw, 43px); }
+      .hero-copy p { max-width: 340px; margin-top: 12px; font-size: 12px; line-height: 1.7; }
+      .eyebrow { font-size: 9px; margin-bottom: 13px; }
+      .console-mark { font-size: 9px; }
+      .console-top-meta { gap: 5px; letter-spacing: .05em; }
+      .console-top-meta .online-status { gap: 5px; }
+      .console-top-meta .serial { display: none; }
+      .meter-wrap { width: min(73vw, 278px); }
+      .speed-number { font-size: clamp(43px, 13.4vw, 56px); }
+      .start-button { min-width: 194px; min-height: 51px; font-size: 11px; }
+      .share-button { width: 49px; height: 49px; }
+      .console-footer { gap: 8px; }
+      .progress-label { font-size: 8px; }
+      .progress-percent { font-size: 8px; }
+      .stats-section, .network-section, .history-section, .about-section { padding-top: 52px; }
+      .section-heading { margin-bottom: 16px; }
+      .section-heading h2 { font-size: 23px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-card:last-child { grid-column: auto; }
+      .stat-card { min-height: 140px; }
+      .network-card-head > span { display: none; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-card:last-child { grid-column: auto; }
+      .about-card { min-height: 0; }
+      .footer-inner { gap: 13px; }
+      .footer-copy { font-size: 9px; }
+      .history-count { margin-inline-start: 5px; padding: 4px 7px; }
+      .clear-button { min-height: 36px; padding-inline: 10px; font-size: 9px; }
+      .clear-button .icon { width: 15px; height: 15px; }
+      .sequence-list { gap: 5px; }
+      .sequence-step { gap: 5px; }
+      .step-copy span { display: none; }
+      .step-copy { padding-top: 5px; }
+    }
+    @media (max-width: 380px) {
+      .brand { gap: 6px; font-size: 15px; }
+      .brand-bolt { font-size: 21px; }
+      .header-actions { gap: 4px; }
+      .icon-button { width: 33px; height: 33px; }
+      .install-button { width: 35px; min-width: 35px; min-height: 35px; }
+      .install-button .icon { width: 16px; height: 16px; }
+      .header-inner { min-height: 61px; }
+      .console-top-meta { font-size: 7px; }
+      .rail-title { font-size: 9px; }
+      .history-heading { gap: 8px; }
+    }
+    @media (max-width: 320px) {
+      .container { width: calc(100% - 22px); }
+      .header-inner { width: calc(100% - 16px); }
+      .brand { font-size: 14px; }
+      .header-actions { gap: 3px; }
+      .icon-button { width: 31px; height: 31px; }
+      .install-button { width: 33px; min-width: 33px; }
+      .start-button { min-width: 180px; padding-inline: 20px; }
+      .section-heading h2 { font-size: 21px; }
+      .history-entry { padding: 13px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      #ambientCanvas { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Skip to main content</a>
+  <svg class="svg-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.7 14.2A8.5 8.5 0 0 1 9.8 3.3 8.6 8.6 0 1 0 20.7 14.2Z"/><path d="m16.5 3 .5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5.5-1.5Z"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7m3-10a9 9 0 0 1 0 13"/></symbol>
+    <symbol id="i-volume-off" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 5 6m0-6-5 6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5m5-5v12"/></symbol>
+    <symbol id="i-signal" viewBox="0 0 24 24"><path d="M2 8.8a15.6 15.6 0 0 1 20 0M5 12a11 11 0 0 1 14 0m-11 3.3a6.2 6.2 0 0 1 8 0M12 19h.01"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.7 6.8-4.4m-6.8 7 6.8 4.1"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18m-2 0-.9 14H5.9L5 6m4 0V4h6v2m-5 4v6m4-6v6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m18 6-12 12M6 6l12 12"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8 15.5a5.8 5.8 0 0 1 8 0m-5 3h2M2 9.5a14.3 14.3 0 0 1 20 0"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-network" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><path d="M10 6.5h4a3 3 0 0 1 3 3V14m-6-3.5H7a3 3 0 0 0-3 3V16"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9L19 16ZM5 2l.7 1.3L7 4l-1.3.7L5 6l-.7-1.3L3 4l1.3-.7L5 2Z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 5v2"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-4 4"/></symbol>
+    <symbol id="i-install" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M12 7v8m-3-3 3 3 3-3m-6 6h6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3L12 14.6 5.6 22H2.5l7.3-8.4L2 2h6.5l4.5 6.9L18.9 2Zm-1.1 18h1.7L7.4 3.9H5.6L17.8 20Z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 11v5m0-8h.01"/></symbol>
+  </svg>
+
+  <canvas id="ambientCanvas" aria-hidden="true"></canvas>
+  <div class="ambient-grid" aria-hidden="true"></div>
+
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner">
+      <a class="brand" href="#home" aria-label="SpeedPulse home"><span class="brand-bolt" aria-hidden="true">⚡</span><span class="brand-word">SpeedPulse</span></a>
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="#home">Home</a>
+        <a href="#history">History</a>
+        <a href="#about">About</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-button" id="soundButton" type="button" aria-label="Turn sound effects on" aria-pressed="false" title="Sound effects">
+          <svg class="icon" aria-hidden="true"><use id="soundIconUse" href="#i-volume-off"></use></svg>
+        </button>
+        <button class="icon-button" id="themeButton" type="button" aria-label="Switch to light mode" title="Switch theme">
+          <svg class="icon" aria-hidden="true"><use id="themeIconUse" href="#i-sun"></use></svg>
+        </button>
+        <button class="install-button" id="installButton" type="button" aria-label="Install or learn how to install SpeedPulse">
+          <svg class="icon" aria-hidden="true"><use href="#i-install"></use></svg><span class="install-label">Install App</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="mainContent">
+    <section class="hero-section container" id="home" aria-labelledby="heroTitle">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">Network performance · made clear</p>
+        <h1 id="heroTitle">Meet your connection’s<br><span class="gradient-word">real speed.</span></h1>
+        <p>One quick pulse to see how your internet really performs. Precise readings, a little less noise.</p>
+      </div>
+
+      <section class="test-console glass-card reveal reveal-delay-1" id="testConsole" aria-label="Internet speed test console">
+        <div class="console-topbar">
+          <div class="console-mark"><svg class="icon" aria-hidden="true"><use href="#i-spark"></use></svg><span>SpeedPulse / Console</span></div>
+          <div class="console-top-meta">
+            <span class="online-status" id="onlineStatus"><span class="online-dot" aria-hidden="true"></span><span id="onlineText">Online</span></span>
+            <span class="serial">SP—01 / READY</span>
+          </div>
+        </div>
+
+        <div class="console-grid">
+          <aside class="telemetry-rail" aria-label="Connection telemetry">
+            <div class="rail-card">
+              <h2 class="rail-title"><span>Local signal</span><svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg></h2>
+              <div class="signal-main">
+                <div class="signal-orb" aria-hidden="true"><svg class="icon"><use href="#i-signal"></use></svg></div>
+                <div class="signal-copy"><strong id="connectionType">Detecting…</strong><span id="connectionQuality">Browser connection</span></div>
+              </div>
+              <div class="signal-bars" aria-hidden="true"><span style="--bar:1"></span><span style="--bar:2"></span><span style="--bar:3"></span><span style="--bar:4"></span><span style="--bar:5"></span></div>
+              <div class="rail-divider"></div>
+              <div class="rail-stat-line"><span>Connection API</span><strong id="connectionApiState">Checking</strong></div>
+              <div class="rail-stat-line"><span>Data saver</span><strong id="dataSaverState">—</strong></div>
+              <p class="rail-note" id="connectionNote">Network details depend on what your browser makes available.</p>
+            </div>
+          </aside>
+
+          <div class="center-stage">
+            <p class="center-kicker"><span class="live-dot" aria-hidden="true"></span><span>Current throughput</span></p>
+            <div class="meter-wrap" id="meterWrap" role="img" aria-label="Speed gauge. Current reading 0.00 megabits per second.">
+              <div class="meter-halo" aria-hidden="true"></div>
+              <svg class="meter-svg" viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+                <defs>
+                  <linearGradient id="meterGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00d4ff"/><stop offset=".55" stop-color="#716bff"/><stop offset="1" stop-color="#b253ff"/></linearGradient>
+                </defs>
+                <circle class="meter-outline" cx="120" cy="120" r="114"></circle>
+                <circle class="meter-gradient-ring" cx="120" cy="120" r="108"></circle>
+                <circle class="meter-dots" cx="120" cy="120" r="105"></circle>
+                <circle class="meter-track" cx="120" cy="120" r="99"></circle>
+                <circle class="meter-arc" id="gaugeArc" cx="120" cy="120" r="99"></circle>
+                <circle class="meter-inner-ring" cx="120" cy="120" r="86"></circle>
+              </svg>
+              <div class="gauge-center">
+                <p class="meter-label">Speed</p>
+                <span class="speed-number" id="speedNumber">0.00</span>
+                <span class="speed-unit">Mbps</span>
+              </div>
+            </div>
+            <div class="meter-scale" aria-hidden="true"><span>0 Mbps</span><span>1,000 Mbps</span></div>
+            <div class="status-line" role="status" aria-live="polite" aria-atomic="true"><span class="status-dot" id="statusDot" aria-hidden="true"></span><span id="statusText">Ready to test</span></div>
+            <p class="status-detail" id="statusDetail">A quick check of your download, upload, and latency.</p>
+            <div class="button-row">
+              <button class="start-button" id="startButton" type="button" aria-label="Start internet speed test">
+                <svg class="icon start-button-icon" id="startIcon" aria-hidden="true"><use href="#i-spark"></use></svg>
+                <span id="startButtonLabel">Start test</span>
+                <span class="button-spinner" id="buttonSpinner" aria-hidden="true" hidden></span>
+              </button>
+              <button class="share-button" id="shareButton" type="button" aria-label="Share speed test results" title="Share results" hidden>
+                <svg class="icon" aria-hidden="true"><use href="#i-share"></use></svg>
+              </button>
+            </div>
+            <div class="keyboard-hint"><kbd>SPACE</kbd><span>to start or run again</span></div>
+          </div>
+
+          <aside class="sequence-rail" aria-label="Test sequence">
+            <div class="rail-card">
+              <h2 class="rail-title"><span>Test sequence</span><svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg></h2>
+              <ol class="sequence-list" id="sequenceList">
+                <li class="sequence-step" data-step="ping"><span class="step-bullet">01</span><span class="step-copy"><strong>Latency</strong><span>5 quick probes</span></span></li>
+                <li class="sequence-step" data-step="download"><span class="step-bullet">02</span><span class="step-copy"><strong>Download</strong><span>3 × 25 MB rounds</span></span></li>
+                <li class="sequence-step" data-step="upload"><span class="step-bullet">03</span><span class="step-copy"><strong>Upload</strong><span>10 MB payload</span></span></li>
+              </ol>
+              <div class="profile-chip"><svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg><span>Measured in your browser. Results stay on this device.</span></div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="console-footer" aria-label="Test progress">
+          <span class="progress-label" id="progressLabel">Awaiting start</span>
+          <div class="progress-track" id="progressTrack" role="progressbar" aria-label="Speed test progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="progressFill"></div></div>
+          <span class="progress-percent" id="progressPercent">00%</span>
+        </div>
+      </section>
+    </section>
+
+    <section class="stats-section container reveal" id="results" aria-labelledby="resultsTitle" hidden>
+      <div class="section-heading">
+        <div><p class="eyebrow">The numbers behind the pulse</p><h2 id="resultsTitle">Your connection, measured.</h2></div>
+        <p>Live readings update as each part of the test runs.</p>
+      </div>
+      <div class="stats-grid">
+        <article class="stat-card glass-card" data-stat="download">
+          <div class="stat-top"><div class="stat-label-wrap"><span class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg></span><span class="stat-label">Download</span></div><span class="stat-live">Mbps</span></div>
+          <div class="stat-value-row"><span class="stat-value" id="downloadValue">0.00</span><span class="stat-unit">Mbps</span></div>
+          <div class="stat-meta"><span id="downloadMeta">Incoming speed</span><span>↓</span></div>
+          <div class="stat-bar" role="progressbar" aria-label="Download speed relative to 250 megabits per second" aria-valuemin="0" aria-valuemax="250" aria-valuenow="0"><span id="downloadBar"></span></div>
+        </article>
+        <article class="stat-card glass-card" data-stat="upload">
+          <div class="stat-top"><div class="stat-label-wrap"><span class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg></span><span class="stat-label">Upload</span></div><span class="stat-live">Mbps</span></div>
+          <div class="stat-value-row"><span class="stat-value" id="uploadValue">0.00</span><span class="stat-unit">Mbps</span></div>
+          <div class="stat-meta"><span id="uploadMeta">Outgoing speed</span><span>↑</span></div>
+          <div class="stat-bar" role="progressbar" aria-label="Upload speed relative to 150 megabits per second" aria-valuemin="0" aria-valuemax="150" aria-valuenow="0"><span id="uploadBar"></span></div>
+        </article>
+        <article class="stat-card glass-card" data-stat="ping">
+          <div class="stat-top"><div class="stat-label-wrap"><span class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#i-signal"></use></svg></span><span class="stat-label">Latency</span></div><span class="stat-live">ms</span></div>
+          <div class="stat-value-row"><span class="stat-value" id="pingValue">—</span><span class="stat-unit">ms</span></div>
+          <div class="stat-meta"><span id="pingMeta">Lowest round trip</span><span>◷</span></div>
+          <div class="stat-bar" role="progressbar" aria-label="Latency quality, higher is better" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="pingBar"></span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="network-section container reveal" id="network" aria-labelledby="networkTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">A little context</p><h2 id="networkTitle">Your network snapshot.</h2></div>
+        <p>Public network details are looked up on demand and cached for this browser session.</p>
+      </div>
+      <div class="network-card glass-card">
+        <div class="network-card-head"><h3><svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>Connection details</h3><span id="ipLookupState" role="status" aria-live="polite">Looking up public IP…</span></div>
+        <div class="network-info-grid">
+          <div class="network-info"><div class="network-info-label"><svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>Public IP</div><strong class="skeleton" id="ipValue" dir="auto">Loading network details</strong><p id="ipSubtext">Visible to services you connect to</p></div>
+          <div class="network-info"><div class="network-info-label"><svg class="icon" aria-hidden="true"><use href="#i-network"></use></svg>Internet provider</div><strong class="skeleton" id="ispValue" dir="auto">Loading provider</strong><p id="ispSubtext">ISP / organization</p></div>
+          <div class="network-info"><div class="network-info-label"><svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>Approx. location</div><strong class="skeleton" id="locationValue" dir="auto">Locating network</strong><p id="locationSubtext">Based on IP address</p></div>
+          <div class="network-info"><div class="network-info-label"><svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>Test server</div><strong id="serverValue">Finding nearest edge</strong><p id="serverSubtext">Cloudflare speed-test endpoint</p></div>
+          <div class="network-info"><div class="network-info-label"><svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg>Connection type</div><strong id="networkTypeValue">Checking browser</strong><p id="networkTypeSubtext">Network Information API</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="history-section container reveal" id="history" aria-labelledby="historyTitle">
+      <div class="section-heading history-heading">
+        <div><p class="eyebrow">Saved on this device</p><h2 id="historyTitle">Test history <span class="history-count" id="historyCount">0 saved</span></h2></div>
+        <button class="clear-button" id="clearHistoryButton" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg><span>Clear all</span></button>
+      </div>
+      <div class="history-list" id="historyList" aria-live="polite"></div>
+      <div class="empty-state glass-card" id="emptyHistory">
+        <div class="empty-illustration" aria-hidden="true"><svg class="icon"><use href="#i-chart"></use></svg></div>
+        <h3>No tests in your history yet</h3>
+        <p>Your results will appear here after your first pulse. History is stored locally and never sent to a server.</p>
+      </div>
+    </section>
+
+    <section class="about-section container reveal" id="about" aria-labelledby="aboutTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">Built for a clearer signal</p><h2 id="aboutTitle">A speed test with nothing to hide.</h2></div>
+      </div>
+      <div class="about-grid">
+        <article class="about-card glass-card"><span class="about-icon"><svg class="icon" aria-hidden="true"><use href="#i-spark"></use></svg></span><h3>Three simple measurements</h3><p>Latency is checked first, then download and upload throughput. Your browser measures each transfer against Cloudflare’s public speed-test endpoint.</p></article>
+        <article class="about-card glass-card"><span class="about-icon"><svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg></span><h3>Your results stay yours</h3><p>Test history and theme preferences live in this browser’s local storage. IP and provider details come from ipapi.co and are cached only for this session.</p></article>
+        <article class="about-card glass-card"><span class="about-icon"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg></span><h3>When a test endpoint is unavailable</h3><p>The app clearly labels a realistic local estimate instead of passing it off as a live result. For a full PWA, browsers require a same-origin service-worker file on HTTPS; a service worker cannot be made installable from a single HTML Blob.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner container">
+      <div class="footer-copy"><strong>Made with ⚡ by SpeedPulse</strong><br><span>© <span id="copyrightYear"></span> SpeedPulse · Version 1.0.0</span></div>
+      <div class="footer-social" aria-label="Share SpeedPulse">
+        <a id="socialX" href="https://twitter.com/intent/tweet?text=Check%20your%20connection%20with%20SpeedPulse" target="_blank" rel="noopener noreferrer" aria-label="Share SpeedPulse on X"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></a>
+        <a id="socialWhatsApp" href="https://wa.me/?text=Check%20your%20connection%20with%20SpeedPulse" target="_blank" rel="noopener noreferrer" aria-label="Share SpeedPulse on WhatsApp"><svg class="icon" aria-hidden="true"><use href="#i-message"></use></svg></a>
+        <a id="socialEmail" href="mailto:?subject=SpeedPulse%20Internet%20Speed%20Test&amp;body=Check%20your%20connection%20with%20SpeedPulse" aria-label="Share SpeedPulse by email"><svg class="icon" aria-hidden="true"><use href="#i-mail"></use></svg></a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="installDialog" aria-labelledby="installDialogTitle">
+    <div class="modal-content">
+      <div class="modal-header"><div><h2 id="installDialogTitle">Take SpeedPulse with you</h2><p>A focused, app-like way to check your connection whenever you need it.</p></div><button class="modal-close" type="button" data-close-dialog="installDialog" aria-label="Close install dialog"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-close"></use></svg></button></div>
+      <div class="app-preview"><img id="appPreviewIcon" alt="SpeedPulse app icon" width="55" height="55"><div><strong>SpeedPulse</strong><span>Internet Speed Test · Version 1.0.0</span></div></div>
+      <p class="pwa-note" id="pwaNote">For reliable installation and offline caching, serve this file from HTTPS. Browser security does not allow a service worker to be registered from an inline Blob or from file://. The test itself still works as a standalone HTML file.</p>
+      <div class="modal-actions"><button class="modal-button" type="button" data-close-dialog="installDialog">Not now</button><button class="modal-button primary" id="installNowButton" type="button">How to install</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="clearDialog" aria-labelledby="clearDialogTitle">
+    <div class="modal-content">
+      <div class="modal-header"><div><h2 id="clearDialogTitle">Clear test history?</h2><p>This removes saved results from this browser only. This action can’t be undone.</p></div><button class="modal-close" type="button" data-close-dialog="clearDialog" aria-label="Close confirmation"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-close"></use></svg></button></div>
+      <div class="modal-actions" style="margin-top:22px"><button class="modal-button" type="button" data-close-dialog="clearDialog">Keep history</button><button class="modal-button danger" id="confirmClearButton" type="button">Clear history</button></div>
+    </div>
+  </dialog>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+      const HISTORY_KEY = 'speedpulse-history-v1';
+      const THEME_KEY = 'speedpulse-theme-v1';
+      const SOUND_KEY = 'speedpulse-sound-v1';
+      const IP_SESSION_KEY = 'speedpulse-ip-v1';
+      const DOWNLOAD_URL = 'https://speed.cloudflare.com/__down?bytes=25000000';
+      const UPLOAD_URL = 'https://speed.cloudflare.com/__up';
+      const PING_URL = 'https://speed.cloudflare.com/__down?bytes=0';
+      const DOWNLOAD_BYTES = 25000000;
+      const UPLOAD_BYTES = 10 * 1024 * 1024;
+      const DOWNLOAD_ROUNDS = 3;
+      const PING_PROBES = 5;
+      const CIRCUMFERENCE = 2 * Math.PI * 99;
+      const reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
+
+      const els = {
+        root: document.documentElement,
+        header: $('#siteHeader'),
+        themeButton: $('#themeButton'),
+        themeIcon: $('#themeIconUse'),
+        soundButton: $('#soundButton'),
+        soundIcon: $('#soundIconUse'),
+        installButton: $('#installButton'),
+        installDialog: $('#installDialog'),
+        installNowButton: $('#installNowButton'),
+        pwaNote: $('#pwaNote'),
+        appPreviewIcon: $('#appPreviewIcon'),
+        startButton: $('#startButton'),
+        startButtonLabel: $('#startButtonLabel'),
+        startIcon: $('#startIcon'),
+        spinner: $('#buttonSpinner'),
+        shareButton: $('#shareButton'),
+        speedNumber: $('#speedNumber'),
+        meterArc: $('#gaugeArc'),
+        meterWrap: $('#meterWrap'),
+        statusDot: $('#statusDot'),
+        statusText: $('#statusText'),
+        statusDetail: $('#statusDetail'),
+        progressLabel: $('#progressLabel'),
+        progressTrack: $('#progressTrack'),
+        progressFill: $('#progressFill'),
+        progressPercent: $('#progressPercent'),
+        console: $('#testConsole'),
+        stats: $('#results'),
+        downloadValue: $('#downloadValue'),
+        uploadValue: $('#uploadValue'),
+        pingValue: $('#pingValue'),
+        downloadMeta: $('#downloadMeta'),
+        uploadMeta: $('#uploadMeta'),
+        pingMeta: $('#pingMeta'),
+        downloadBar: $('#downloadBar'),
+        uploadBar: $('#uploadBar'),
+        pingBar: $('#pingBar'),
+        historyList: $('#historyList'),
+        emptyHistory: $('#emptyHistory'),
+        historyCount: $('#historyCount'),
+        clearHistoryButton: $('#clearHistoryButton'),
+        clearDialog: $('#clearDialog'),
+        confirmClearButton: $('#confirmClearButton'),
+        toast: $('#toast'),
+        onlineStatus: $('#onlineStatus'),
+        onlineText: $('#onlineText'),
+        connectionType: $('#connectionType'),
+        connectionQuality: $('#connectionQuality'),
+        connectionApiState: $('#connectionApiState'),
+        dataSaverState: $('#dataSaverState'),
+        connectionNote: $('#connectionNote'),
+        ipLookupState: $('#ipLookupState'),
+        ipValue: $('#ipValue'),
+        ispValue: $('#ispValue'),
+        locationValue: $('#locationValue'),
+        ispSubtext: $('#ispSubtext'),
+        locationSubtext: $('#locationSubtext'),
+        networkTypeValue: $('#networkTypeValue'),
+        networkTypeSubtext: $('#networkTypeSubtext'),
+        serverValue: $('#serverValue'),
+        serverSubtext: $('#serverSubtext'),
+        confetti: $('#confettiLayer'),
+        copyrightYear: $('#copyrightYear')
+      };
+
+      const state = {
+        running: false,
+        completed: false,
+        gaugeValue: 0,
+        gaugeFrame: 0,
+        statFrames: Object.create(null),
+        history: [],
+        lastResults: null,
+        toastTimer: 0,
+        soundOn: false,
+        audioContext: null,
+        lastSoundAt: 0,
+        deferredInstallPrompt: null,
+        manifestUrl: null,
+        serviceWorkerState: 'unknown',
+        ipPromise: null,
+        ipInfo: null,
+        progress: 0
+      };
+
+      function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
+      function randomBetween(min, max) { return min + Math.random() * (max - min); }
+      function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+      function nextFrame() { return new Promise(resolve => requestAnimationFrame(resolve)); }
+      function formatMbps(value) { return Number.isFinite(value) ? Math.max(0, value).toFixed(2) : '0.00'; }
+      function setHref(use, id) { if (use) use.setAttribute('href', `#${id}`); }
+
+      function setTheme(theme, save = true) {
+        const resolved = theme === 'light' ? 'light' : 'dark';
+        els.root.dataset.theme = resolved;
+        if (save) {
+          try { localStorage.setItem(THEME_KEY, resolved); } catch (_) {}
+        }
+        const lightMode = resolved === 'light';
+        setHref(els.themeIcon, lightMode ? 'i-moon' : 'i-sun');
+        els.themeButton.setAttribute('aria-label', lightMode ? 'Switch to dark mode' : 'Switch to light mode');
+        els.themeButton.title = lightMode ? 'Switch to dark mode' : 'Switch to light mode';
+        const themeMeta = $('#themeColorMeta');
+        if (themeMeta) themeMeta.setAttribute('content', lightMode ? '#f2f6ff' : '#0a0e27');
+        if (state.manifestUrl) refreshManifest();
+      }
+
+      function initTheme() {
+        let saved = '';
+        try { saved = localStorage.getItem(THEME_KEY) || ''; } catch (_) {}
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        setTheme(saved || (prefersLight ? 'light' : 'dark'), false);
+        if (!saved && window.matchMedia) {
+          const media = window.matchMedia('(prefers-color-scheme: light)');
+          const onPreference = event => setTheme(event.matches ? 'light' : 'dark', false);
+          if (media.addEventListener) media.addEventListener('change', onPreference);
+          else if (media.addListener) media.addListener(onPreference);
+        }
+      }
+
+      function speedColor(value) {
+        if (value < 10) return '#ff4444';
+        if (value < 30) return '#ff8800';
+        if (value < 60) return '#ffdd00';
+        if (value < 100) return '#00d4ff';
+        return '#00ff88';
+      }
+
+      function renderGauge(value) {
+        const safe = Number.isFinite(value) ? Math.max(0, value) : 0;
+        state.gaugeValue = safe;
+        const fraction = clamp(Math.log1p(safe) / Math.log1p(1000), 0, 1);
+        els.meterArc.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - fraction));
+        const color = speedColor(safe);
+        els.meterArc.style.setProperty('--meter-color', color);
+        els.meterWrap.style.setProperty('--meter-color', color);
+        els.speedNumber.textContent = formatMbps(safe);
+        els.meterWrap.setAttribute('aria-label', `Speed gauge. Current reading ${formatMbps(safe)} megabits per second.`);
+      }
+
+      function setGauge(target, duration = 270) {
+        const end = Number.isFinite(target) ? Math.max(0, target) : 0;
+        if (state.gaugeFrame) cancelAnimationFrame(state.gaugeFrame);
+        if (reduceMotion || duration <= 0) { renderGauge(end); state.gaugeFrame = 0; return; }
+        const from = state.gaugeValue;
+        const started = performance.now();
+        const step = now => {
+          const t = clamp((now - started) / duration, 0, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          renderGauge(from + (end - from) * eased);
+          if (t < 1) state.gaugeFrame = requestAnimationFrame(step);
+          else state.gaugeFrame = 0;
+        };
+        state.gaugeFrame = requestAnimationFrame(step);
+      }
+
+      function updateProgress(value, label) {
+        state.progress = clamp(value, 0, 100);
+        const percent = Math.round(state.progress);
+        els.progressFill.style.width = `${state.progress}%`;
+        els.progressTrack.setAttribute('aria-valuenow', String(percent));
+        els.progressPercent.textContent = `${String(percent).padStart(2, '0')}%`;
+        if (label) els.progressLabel.textContent = label;
+      }
+
+      function setStatus(text, detail, mode = 'normal') {
+        els.statusText.textContent = text;
+        els.statusDetail.textContent = detail || '';
+        els.statusDot.className = 'status-dot';
+        if (mode === 'active') els.statusDot.classList.add('is-active');
+        if (mode === 'success') els.statusDot.classList.add('is-success');
+        if (mode === 'estimate') els.statusDot.classList.add('is-estimate');
+      }
+
+      function setStep(activeIndex, completed = false) {
+        const steps = $$('.sequence-step');
+        steps.forEach((step, index) => {
+          const done = completed || index < activeIndex;
+          const active = !completed && index === activeIndex;
+          step.classList.toggle('is-done', done);
+          step.classList.toggle('is-active', active);
+          if (active) step.setAttribute('aria-current', 'step');
+          else step.removeAttribute('aria-current');
+          const bullet = $('.step-bullet', step);
+          if (bullet) {
+            if (done) bullet.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>';
+            else bullet.textContent = String(index + 1).padStart(2, '0');
+          }
+        });
+      }
+
+      function statElements(key) {
+        if (key === 'download') return { value: els.downloadValue, bar: els.downloadBar, max: 250 };
+        if (key === 'upload') return { value: els.uploadValue, bar: els.uploadBar, max: 150 };
+        return { value: els.pingValue, bar: els.pingBar, max: 200 };
+      }
+
+      function setStat(key, value, animate = false) {
+        const target = Number.isFinite(value) ? Math.max(0, value) : 0;
+        const { value: output, bar, max } = statElements(key);
+        const paint = number => {
+          output.textContent = key === 'ping' ? String(Math.round(number)) : formatMbps(number);
+          const quality = key === 'ping' ? (1 - clamp(number / max, 0, 1)) * 100 : clamp(number / max, 0, 1) * 100;
+          bar.style.width = `${quality}%`;
+          const progress = bar.closest('[role="progressbar"]');
+          if (progress) progress.setAttribute('aria-valuenow', String(Math.round(key === 'ping' ? quality : clamp(number, 0, max))));
+        };
+        if (!animate || reduceMotion) { if (state.statFrames[key]) cancelAnimationFrame(state.statFrames[key]); state.statFrames[key] = 0; paint(target); return; }
+        if (state.statFrames[key]) cancelAnimationFrame(state.statFrames[key]);
+        const current = parseFloat(output.textContent.replace(/[^ -.]/g, '')) || 0;
+        const start = performance.now();
+        const duration = 620;
+        const step = now => {
+          const t = clamp((now - start) / duration, 0, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          paint(current + (target - current) * eased);
+          if (t < 1) state.statFrames[key] = requestAnimationFrame(step);
+          else state.statFrames[key] = 0;
+        };
+        state.statFrames[key] = requestAnimationFrame(step);
+      }
+
+      function showStats() {
+        if (els.stats.hidden) {
+          els.stats.hidden = false;
+          requestAnimationFrame(() => els.stats.classList.add('is-visible'));
+        }
+      }
+
+      function setOnlineStatus() {
+        const isOnline = navigator.onLine !== false;
+        els.onlineStatus.classList.toggle('is-offline', !isOnline);
+        els.onlineText.textContent = isOnline ? 'Online' : 'Offline · local mode';
+      }
+
+      function connectionInfo() {
+        return navigator.connection || navigator.mozConnection || navigator.webkitConnection || null;
+      }
+
+      function updateConnectionDisplay() {
+        const conn = connectionInfo();
+        const type = conn && (conn.type || conn.effectiveType);
+        if (!conn) {
+          els.connectionType.textContent = 'Not exposed';
+          els.connectionQuality.textContent = 'Browser keeps this private';
+          els.connectionApiState.textContent = 'Unavailable';
+          els.dataSaverState.textContent = '—';
+          els.connectionNote.textContent = 'Your browser does not provide connection details here.';
+          els.networkTypeValue.textContent = 'Not exposed';
+          els.networkTypeSubtext.textContent = 'Network Information API unavailable';
+          return;
+        }
+        const label = type ? String(type).replace(/^./, char => char.toUpperCase()) : 'Connected';
+        const downlink = Number.isFinite(conn.downlink) ? `~${conn.downlink} Mbps estimate` : 'Browser-reported link';
+        els.connectionType.textContent = label;
+        els.connectionQuality.textContent = conn.effectiveType ? `${String(conn.effectiveType).toUpperCase()} connection` : 'Active network';
+        els.connectionApiState.textContent = 'Available';
+        els.dataSaverState.textContent = conn.saveData ? 'On' : 'Off';
+        els.connectionNote.textContent = Number.isFinite(conn.rtt) ? `${downlink} · browser RTT ${Math.round(conn.rtt)} ms` : downlink;
+        els.networkTypeValue.textContent = label;
+        els.networkTypeSubtext.textContent = [conn.effectiveType ? String(conn.effectiveType).toUpperCase() : '', Number.isFinite(conn.downlink) ? `~${conn.downlink} Mbps reported` : 'Browser estimate'].filter(Boolean).join(' · ');
+      }
+
+      async function fetchJsonWithTimeout(url, timeoutMs = 4500) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const response = await fetch(url, { cache: 'no-store', signal: controller.signal, headers: { 'Accept': 'application/json' } });
+          if (!response.ok) throw new Error(`Request failed (${response.status})`);
+          return await response.json();
+        } finally { clearTimeout(timer); }
+      }
+
+      function removeSkeletons() {
+        [els.ipValue, els.ispValue, els.locationValue].forEach(item => item.classList.remove('skeleton'));
+      }
+
+      function applyIpInfo(data, cached = false) {
+        const ip = data.ip || data.ip_address || '';
+        const isp = data.org || data.isp || data.asn || '';
+        const city = data.city || '';
+        const region = data.region || data.region_name || '';
+        const country = data.country_name || data.country || data.country_code || '';
+        els.ipValue.textContent = ip || 'Not available';
+        els.ispValue.textContent = isp || 'Not identified';
+        els.locationValue.textContent = [city, region].filter((v, i, a) => v && a.indexOf(v) === i).join(', ') || country || 'Not available';
+        els.ispSubtext.textContent = isp ? (data.asn ? String(data.asn) : 'ISP / network organization') : 'ISP information unavailable';
+        els.locationSubtext.textContent = country ? `${country}${data.latitude && data.longitude ? ` · ${Number(data.latitude).toFixed(1)}°, ${Number(data.longitude).toFixed(1)}°` : ''}` : 'Location unavailable';
+        els.ipLookupState.textContent = cached ? 'Cached for this session' : 'Network details loaded';
+        removeSkeletons();
+      }
+
+      async function loadIpInfo(force = false) {
+        if (state.ipPromise && !force) return state.ipPromise;
+        if (!force) {
+          try {
+            const saved = sessionStorage.getItem(IP_SESSION_KEY);
+            if (saved) {
+              const item = JSON.parse(saved);
+              if (item && item.savedAt && Date.now() - item.savedAt < 8 * 60 * 60 * 1000 && item.data) {
+                state.ipInfo = item.data;
+                applyIpInfo(item.data, true);
+                return item.data;
+              }
+            }
+          } catch (_) {}
+        }
+        els.ipLookupState.textContent = 'Looking up public IP…';
+        state.ipPromise = fetchJsonWithTimeout('https://ipapi.co/json/', 4500).then(data => {
+          if (!data || data.error) throw new Error('IP lookup unavailable');
+          state.ipInfo = data;
+          applyIpInfo(data, false);
+          try { sessionStorage.setItem(IP_SESSION_KEY, JSON.stringify({ savedAt: Date.now(), data })); } catch (_) {}
+          return data;
+        }).catch(() => {
+          removeSkeletons();
+          els.ipValue.textContent = 'Unavailable';
+          els.ispValue.textContent = 'Unavailable';
+          els.locationValue.textContent = 'Unavailable';
+          els.ipSubtext.textContent = 'Could not reach the IP information service';
+          els.ispSubtext.textContent = 'Try again when online';
+          els.locationSubtext.textContent = 'No location data received';
+          els.ipLookupState.textContent = 'Lookup unavailable';
+          return null;
+        }).finally(() => { state.ipPromise = null; });
+        return state.ipPromise;
+      }
+
+      async function loadServerInfo() {
+        try {
+          const meta = await fetchJsonWithTimeout('https://speed.cloudflare.com/meta', 4500);
+          const place = [meta.city, meta.country].filter(Boolean).join(', ');
+          els.serverValue.textContent = place || (meta.colo ? `Cloudflare · ${meta.colo}` : 'Cloudflare Anycast');
+          els.serverSubtext.textContent = meta.colo ? `Nearest test edge · ${meta.colo}` : 'Nearest available speed-test edge';
+        } catch (_) {
+          els.serverValue.textContent = 'Cloudflare Anycast';
+          els.serverSubtext.textContent = 'Nearest edge · city not exposed';
+        }
+      }
+
+      function openDialog(dialog) {
+        if (!dialog) return;
+        if (typeof dialog.showModal === 'function') dialog.showModal();
+        else dialog.setAttribute('open', '');
+      }
+      function closeDialog(dialog) {
+        if (!dialog) return;
+        if (typeof dialog.close === 'function' && dialog.open) dialog.close();
+        else dialog.removeAttribute('open');
+      }
+
+      function toast(message, duration = 3200) {
+        els.toast.textContent = message;
+        els.toast.classList.add('is-visible');
+        clearTimeout(state.toastTimer);
+        state.toastTimer = setTimeout(() => els.toast.classList.remove('is-visible'), duration);
+      }
+
+      function createIcon(symbol, className = 'icon') {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', className);
+        svg.setAttribute('aria-hidden', 'true');
+        const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttribute('href', `#${symbol}`);
+        svg.appendChild(use);
+        return svg;
+      }
+
+      function readHistory() {
+        try {
+          const data = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+          return Array.isArray(data) ? data.filter(item => item && Number.isFinite(item.at) && Number.isFinite(item.download) && Number.isFinite(item.upload) && Number.isFinite(item.ping)).slice(0, 20) : [];
+        } catch (_) { return []; }
+      }
+
+      function makeHistoryMetric(label, value, unit) {
+        const wrap = document.createElement('div');
+        wrap.className = 'history-metric';
+        const name = document.createElement('span');
+        name.textContent = label;
+        const number = document.createElement('strong');
+        number.textContent = `${value}${unit ? ` ${unit}` : ''}`;
+        wrap.append(name, number);
+        return wrap;
+      }
+
+      function renderHistory() {
+        els.historyList.replaceChildren();
+        const count = state.history.length;
+        els.historyCount.textContent = `${count} ${count === 1 ? 'saved' : 'saved'}`;
+        els.clearHistoryButton.disabled = count === 0;
+        els.emptyHistory.hidden = count !== 0;
+        els.historyList.hidden = count === 0;
+        state.history.forEach((item, index) => {
+          const row = document.createElement('article');
+          row.className = 'history-entry glass-card';
+          row.style.animationDelay = `${Math.min(index, 6) * 35}ms`;
+          const dateWrap = document.createElement('div');
+          dateWrap.className = 'history-entry-date';
+          dateWrap.appendChild(createIcon('i-clock'));
+          const time = document.createElement('time');
+          time.dateTime = new Date(item.at).toISOString();
+          try { time.textContent = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(item.at)); }
+          catch (_) { time.textContent = new Date(item.at).toLocaleString(); }
+          dateWrap.appendChild(time);
+          const badge = document.createElement('span');
+          badge.className = `history-badge${item.source === 'LIVE' ? ' is-live' : ''}`;
+          badge.textContent = item.source || 'ESTIMATE';
+          dateWrap.appendChild(badge);
+          const metrics = document.createElement('div');
+          metrics.className = 'history-metrics';
+          metrics.append(makeHistoryMetric('Download', formatMbps(item.download), 'Mbps'), makeHistoryMetric('Upload', formatMbps(item.upload), 'Mbps'), makeHistoryMetric('Ping', String(Math.round(item.ping)), 'ms'));
+          const del = document.createElement('button');
+          del.className = 'delete-entry';
+          del.type = 'button';
+          del.dataset.deleteId = String(item.id);
+          del.setAttribute('aria-label', `Delete speed test from ${time.textContent}`);
+          del.title = 'Delete this result';
+          del.appendChild(createIcon('i-trash'));
+          row.append(dateWrap, metrics, del);
+          els.historyList.appendChild(row);
+        });
+      }
+
+      function persistHistory() {
+        try { localStorage.setItem(HISTORY_KEY, JSON.stringify(state.history.slice(0, 20))); } catch (_) { toast('History could not be saved in this browser.'); }
+        renderHistory();
+      }
+
+      function saveResult(result) {
+        let id;
+        try { id = crypto.randomUUID(); } catch (_) { id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`; }
+        state.history.unshift({ id, at: Date.now(), download: result.download, upload: result.upload, ping: result.ping, source: result.source });
+        state.history = state.history.slice(0, 20);
+        persistHistory();
+      }
+
+      function setSoundButton() {
+        setHref(els.soundIcon, state.soundOn ? 'i-volume' : 'i-volume-off');
+        els.soundButton.setAttribute('aria-pressed', String(state.soundOn));
+        els.soundButton.setAttribute('aria-label', state.soundOn ? 'Turn sound effects off' : 'Turn sound effects on');
+        els.soundButton.title = state.soundOn ? 'Sound effects on' : 'Sound effects off';
+      }
+
+      async function ensureAudio() {
+        if (!state.soundOn) return null;
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return null;
+          if (!state.audioContext) state.audioContext = new AudioCtx();
+          if (state.audioContext.state === 'suspended') await state.audioContext.resume();
+          return state.audioContext;
+        } catch (_) { return null; }
+      }
+
+      async function playTick(speed = 80, force = false) {
+        if (!state.soundOn || (!force && performance.now() - state.lastSoundAt < 145)) return;
+        state.lastSoundAt = performance.now();
+        const ctx = await ensureAudio();
+        if (!ctx) return;
+        try {
+          const oscillator = ctx.createOscillator();
+          const gain = ctx.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.value = 460 + clamp(speed, 0, 300) * 1.3;
+          gain.gain.setValueAtTime(.0001, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(.023, ctx.currentTime + .012);
+          gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + .07);
+          oscillator.connect(gain);
+          gain.connect(ctx.destination);
+          oscillator.start();
+          oscillator.stop(ctx.currentTime + .08);
+        } catch (_) {}
+      }
+
+      function maybePlayTick(value) {
+        if (state.soundOn) playTick(value, false);
+      }
+
+      function updateSocialShare(result) {
+        const text = result ? `I just tested my connection: ${formatMbps(result.download)} Mbps down, ${formatMbps(result.upload)} Mbps up, ${Math.round(result.ping)} ms latency. Tested with SpeedPulse.` : 'Check your connection with SpeedPulse.';
+        const shareUrl = /^https?:$/.test(location.protocol) ? location.href.split('#')[0] : '';
+        const suffix = shareUrl ? ` ${shareUrl}` : '';
+        const encoded = encodeURIComponent(`${text}${suffix}`);
+        $('#socialX').href = `https://twitter.com/intent/tweet?text=${encoded}`;
+        $('#socialWhatsApp').href = `https://wa.me/?text=${encoded}`;
+        $('#socialEmail').href = `mailto:?subject=${encodeURIComponent('My SpeedPulse internet speed test')}&body=${encoded}`;
+      }
+
+      async function shareResults() {
+        const result = state.lastResults;
+        if (!result) { toast('Run a test first to share your results.'); return; }
+        const url = /^https?:$/.test(location.protocol) ? `\n${location.href.split('#')[0]}` : '';
+        const text = `My SpeedPulse result: ${formatMbps(result.download)} Mbps download · ${formatMbps(result.upload)} Mbps upload · ${Math.round(result.ping)} ms lowest latency.${url}`;
+        try {
+          if (navigator.share) {
+            await navigator.share({ title: 'My SpeedPulse result', text, url: /^https?:$/.test(location.protocol) ? location.href.split('#')[0] : undefined });
+            return;
+          }
+        } catch (error) {
+          if (error && error.name === 'AbortError') return;
+        }
+        try {
+          if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+          else {
+            const area = document.createElement('textarea');
+            area.value = text;
+            area.setAttribute('readonly', '');
+            area.style.position = 'fixed'; area.style.opacity = '0'; area.style.insetInlineStart = '-9999px';
+            document.body.appendChild(area); area.select();
+            const copied = document.execCommand('copy');
+            area.remove();
+            if (!copied) throw new Error('Clipboard unavailable');
+          }
+          toast('Results copied to your clipboard.');
+        } catch (_) { toast('Sharing is not available in this browser.'); }
+      }
+
+      function runConfetti() {
+        if (reduceMotion) return;
+        const colors = ['#00d4ff', '#7b2ff7', '#00ff88', '#ffdd00', '#ff6b9f', '#ffffff'];
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < 42; i++) {
+          const piece = document.createElement('span');
+          piece.className = 'confetti-piece';
+          piece.style.left = `${Math.random() * 100}%`;
+          piece.style.backgroundColor = colors[i % colors.length];
+          piece.style.setProperty('--dx', `${Math.round(randomBetween(-95, 95))}px`);
+          piece.style.setProperty('--rot', `${Math.round(randomBetween(230, 850))}deg`);
+          piece.style.setProperty('--duration', `${randomBetween(1.2, 2.1).toFixed(2)}s`);
+          piece.style.setProperty('--delay', `${randomBetween(0, .32).toFixed(2)}s`);
+          fragment.appendChild(piece);
+        }
+        els.confetti.replaceChildren(fragment);
+        setTimeout(() => els.confetti.replaceChildren(), 2700);
+      }
+
+      function setTestingUI(isTesting) {
+        state.running = isTesting;
+        els.startButton.disabled = isTesting;
+        els.startButton.classList.toggle('is-testing', isTesting);
+        els.startButton.classList.toggle('is-complete', !isTesting && state.completed);
+        els.spinner.hidden = !isTesting;
+        els.startIcon.hidden = isTesting;
+        els.startButtonLabel.textContent = isTesting ? 'Testing…' : (state.completed ? 'Test again' : 'Start test');
+        els.startButton.setAttribute('aria-label', isTesting ? 'Speed test in progress' : (state.completed ? 'Run speed test again' : 'Start internet speed test'));
+        els.console.classList.toggle('is-running', isTesting);
+      }
+
+      async function measurePingProbe() {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 1500);
+        const started = performance.now();
+        try {
+          const response = await fetch(`${PING_URL}&_=${Date.now()}-${Math.random().toString(36).slice(2)}`, { cache: 'no-store', signal: controller.signal });
+          if (!response.ok) throw new Error('Ping endpoint unavailable');
+          if (response.body && response.body.cancel) await response.body.cancel().catch(() => {});
+          else await response.arrayBuffer();
+          return performance.now() - started;
+        } finally { clearTimeout(timeout); }
+      }
+
+      async function measurePings() {
+        const probes = await Promise.allSettled(Array.from({ length: PING_PROBES }, () => measurePingProbe()));
+        return probes.filter(item => item.status === 'fulfilled').map(item => item.value);
+      }
+
+      async function runPingStage() {
+        const started = performance.now();
+        setStep(0);
+        updateProgress(2, 'Latency probes');
+        setStatus('Measuring latency…', 'Five quick round trips to the test endpoint.', 'active');
+        setStat('ping', 0);
+        const samplesPromise = measurePings();
+        const samples = await samplesPromise;
+        await delay(Math.max(0, 1950 - (performance.now() - started)));
+        const isReal = samples.length >= 3;
+        const readings = isReal ? samples : Array.from({ length: PING_PROBES }, () => randomBetween(18, 58));
+        const low = Math.min(...readings);
+        const avg = readings.reduce((sum, n) => sum + n, 0) / readings.length;
+        setStat('ping', low, true);
+        els.pingMeta.textContent = isReal ? `Lowest · ${Math.round(avg)} ms average` : 'Estimated · endpoint unavailable';
+        return { low, average: avg, method: isReal ? 'live' : 'simulated', count: samples.length };
+      }
+
+      async function downloadIteration(index) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 15000);
+        const url = `${DOWNLOAD_URL}&_=${Date.now()}-${index}-${Math.random().toString(36).slice(2)}`;
+        const started = performance.now();
+        let bytes = 0;
+        let lastPaint = 0;
+        try {
+          const response = await fetch(url, { cache: 'no-store', signal: controller.signal });
+          if (!response.ok) throw new Error(`Download endpoint returned ${response.status}`);
+          if (response.body && response.body.getReader) {
+            const reader = response.body.getReader();
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              bytes += value.byteLength;
+              const now = performance.now();
+              if (now - lastPaint > 115) {
+                const elapsed = Math.max(.001, (now - started) / 1000);
+                const current = bytes * 8 / (elapsed * 1000000);
+                setGauge(current, 170);
+                setStat('download', current);
+                const fraction = clamp(bytes / DOWNLOAD_BYTES, 0, .98);
+                updateProgress(8 + ((index + fraction) / DOWNLOAD_ROUNDS) * 49, `Download ${index + 1}/${DOWNLOAD_ROUNDS}`);
+                maybePlayTick(current);
+                lastPaint = now;
+              }
+            }
+          } else {
+            const buffer = await response.arrayBuffer();
+            bytes = buffer.byteLength;
+          }
+          const duration = Math.max(.001, (performance.now() - started) / 1000);
+          if (bytes < 1024 * 1024) throw new Error('Test file was incomplete');
+          return bytes * 8 / (duration * 1000000);
+        } finally { clearTimeout(timer); }
+      }
+
+      async function settleStage(started, minimumMs, target, progressStart, progressEnd, statKey) {
+        const remaining = minimumMs - (performance.now() - started);
+        if (remaining <= 0) return;
+        setStatus('Stabilizing the reading…', 'Finalizing the measurement average.', 'active');
+        const initial = state.gaugeValue;
+        const waitStarted = performance.now();
+        while (performance.now() - waitStarted < remaining) {
+          const t = clamp((performance.now() - waitStarted) / remaining, 0, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          const ripple = Math.sin(t * 15) * target * .006 * (1 - t);
+          const visual = Math.max(0, initial + (target - initial) * eased + ripple);
+          renderGauge(visual);
+          setStat(statKey, visual);
+          updateProgress(progressStart + (progressEnd - progressStart) * t, 'Refining average');
+          await nextFrame();
+        }
+        renderGauge(target);
+        setStat(statKey, target);
+      }
+
+      function simulatedValues(base, count, spread = .13) {
+        return Array.from({ length: count }, () => Math.max(1, base * randomBetween(1 - spread, 1 + spread)));
+      }
+
+      async function simulateStage(kind, values) {
+        const isDownload = kind === 'download';
+        const statKey = kind;
+        const stageStart = performance.now();
+        const rounds = values.length;
+        const stageStartProgress = isDownload ? 8 : 59;
+        const stageEndProgress = isDownload ? 57 : 91;
+        for (let index = 0; index < rounds; index++) {
+          const target = values[index];
+          const from = state.gaugeValue;
+          const started = performance.now();
+          const duration = isDownload ? randomBetween(1640, 1830) : randomBetween(1630, 1780);
+          setStatus(`${isDownload ? 'Download' : 'Upload'} estimate · round ${index + 1} of ${rounds}`, 'The live test endpoint did not respond; showing a local estimate.', 'estimate');
+          while (performance.now() - started < duration) {
+            const t = clamp((performance.now() - started) / duration, 0, 1);
+            const eased = 1 - Math.pow(1 - t, 2.5);
+            const wobble = Math.sin(t * 22 + index) * target * .018 * (1 - t);
+            const current = Math.max(0, from + (target - from) * eased + wobble);
+            renderGauge(current);
+            setStat(statKey, current);
+            updateProgress(stageStartProgress + ((index + t) / rounds) * (stageEndProgress - stageStartProgress), `Estimated ${kind}`);
+            maybePlayTick(current);
+            await nextFrame();
+          }
+          renderGauge(target);
+          setStat(statKey, target);
+        }
+        const average = values.reduce((sum, item) => sum + item, 0) / values.length;
+        renderGauge(average);
+        setStat(statKey, average);
+        return { value: average, method: 'simulated', elapsed: performance.now() - stageStart };
+      }
+
+      async function runDownloadStage() {
+        const started = performance.now();
+        const results = [];
+        setStep(1);
+        setStatus('Testing download…', `Three ${DOWNLOAD_BYTES / 1000000} MB rounds are starting now.`, 'active');
+        for (let index = 0; index < DOWNLOAD_ROUNDS; index++) {
+          setStatus(`Testing download · round ${index + 1} of ${DOWNLOAD_ROUNDS}`, 'Measuring incoming throughput from the test endpoint.', 'active');
+          try {
+            const speed = await downloadIteration(index);
+            results.push(speed);
+            setStat('download', speed);
+          } catch (_) {
+            const base = randomBetween(48, 185);
+            return simulateStage('download', simulatedValues(base, DOWNLOAD_ROUNDS));
+          }
+        }
+        const average = results.reduce((sum, value) => sum + value, 0) / results.length;
+        await settleStage(started, 5100, average, 57, 59, 'download');
+        setStat('download', average, true);
+        renderGauge(average);
+        return { value: average, method: 'live', rounds: results.length, elapsed: performance.now() - started };
+      }
+
+      function buildUploadBlob() {
+        const bytes = new Uint8Array(UPLOAD_BYTES);
+        if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+          for (let offset = 0; offset < bytes.length; offset += 65536) {
+            window.crypto.getRandomValues(bytes.subarray(offset, Math.min(offset + 65536, bytes.length)));
+          }
+        } else {
+          for (let i = 0; i < bytes.length; i++) bytes[i] = Math.random() * 256;
+        }
+        return new Blob([bytes]);
+      }
+
+      async function uploadOnce(onProgress) {
+        const payload = buildUploadBlob();
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 18000);
+        const started = performance.now();
+        try {
+          const response = await fetch(UPLOAD_URL, { method: 'POST', body: payload, cache: 'no-store', signal: controller.signal });
+          if (!response.ok) throw new Error(`Upload endpoint returned ${response.status}`);
+          if (response.body && response.body.cancel) await response.body.cancel().catch(() => {});
+          else await response.arrayBuffer();
+          if (onProgress) onProgress(100);
+          const elapsed = Math.max(.001, (performance.now() - started) / 1000);
+          return UPLOAD_BYTES * 8 / (elapsed * 1000000);
+        } finally { clearTimeout(timer); }
+      }
+
+      async function runLiveUpload(estimatedStart) {
+        let settled = false;
+        let output = 0;
+        let failure = null;
+        const started = performance.now();
+        const task = uploadOnce().then(value => { output = value; }, error => { failure = error; }).finally(() => { settled = true; });
+        while (!settled) {
+          const elapsed = performance.now() - started;
+          const wave = .91 + .035 * Math.sin(elapsed / 410) + Math.min(.04, elapsed / 90000);
+          const current = Math.max(0, estimatedStart * wave);
+          renderGauge(current);
+          setStat('upload', current);
+          updateProgress(61 + Math.min(25, elapsed / 18000 * 25), 'Upload transfer');
+          maybePlayTick(current);
+          await nextFrame();
+        }
+        await task;
+        if (failure) throw failure;
+        return output;
+      }
+
+      async function runUploadStage(downloadSpeed) {
+        const started = performance.now();
+        setStep(2);
+        setStatus('Testing upload…', 'Preparing a randomized 10 MB upload payload.', 'active');
+        updateProgress(60, 'Upload test');
+        const estimate = Math.max(1, downloadSpeed * randomBetween(.32, .58));
+        try {
+          const speed = await runLiveUpload(estimate);
+          await settleStage(started, 5050, speed, 86, 96, 'upload');
+          setStat('upload', speed, true);
+          return { value: speed, method: 'live', elapsed: performance.now() - started };
+        } catch (_) {
+          return simulateStage('upload', simulatedValues(estimate, 3, .12));
+        }
+      }
+
+      async function startTest() {
+        if (state.running) return;
+        state.completed = false;
+        state.lastResults = null;
+        setTestingUI(true);
+        showStats();
+        els.shareButton.hidden = true;
+        setStep(0);
+        setGauge(0, 160);
+        setStat('download', 0);
+        setStat('upload', 0);
+        setStat('ping', 0);
+        els.downloadMeta.textContent = 'Incoming speed';
+        els.uploadMeta.textContent = 'Outgoing speed';
+        els.pingMeta.textContent = 'Five round-trip probes';
+        updateProgress(0, 'Initializing');
+        await ensureAudio();
+        try {
+          const ping = await runPingStage();
+          setStep(1);
+          const download = await runDownloadStage();
+          setStep(2);
+          setStatus(download.method === 'live' ? 'Download measured' : 'Download estimate ready', download.method === 'live' ? 'Incoming throughput measured across three rounds.' : 'The test endpoint was unavailable; this value is estimated.', download.method === 'live' ? 'active' : 'estimate');
+          const upload = await runUploadStage(download.value);
+          const source = ping.method === 'live' && download.method === 'live' && upload.method === 'live' ? 'LIVE' : 'ESTIMATE';
+          const result = {
+            download: download.value,
+            upload: upload.value,
+            ping: ping.low,
+            averagePing: ping.average,
+            source,
+            pingMethod: ping.method,
+            downloadMethod: download.method,
+            uploadMethod: upload.method,
+            at: Date.now()
+          };
+          state.lastResults = result;
+          state.completed = true;
+          setGauge(result.download, reduceMotion ? 0 : 480);
+          setStat('download', result.download, true);
+          setStat('upload', result.upload, true);
+          setStat('ping', result.ping, true);
+          els.downloadMeta.textContent = download.method === 'live' ? 'Average · 3 rounds' : 'Estimated · local fallback';
+          els.uploadMeta.textContent = upload.method === 'live' ? 'Measured upload' : 'Estimated · local fallback';
+          els.pingMeta.textContent = ping.method === 'live' ? `Lowest · ${Math.round(ping.average)} ms average` : 'Estimated · 15–60 ms range';
+          updateProgress(100, 'Test complete');
+          setStep(3, true);
+          setStatus(source === 'LIVE' ? 'Complete · live results' : 'Complete · estimate included', source === 'LIVE' ? 'All three measurements came from the live network test.' : 'Any unavailable endpoint is clearly represented as an estimate.', source === 'LIVE' ? 'success' : 'estimate');
+          els.shareButton.hidden = false;
+          updateSocialShare(result);
+          saveResult(result);
+          runConfetti();
+          toast(source === 'LIVE' ? 'Your live speed test is complete.' : 'Test complete. Estimated values are labeled in your results.');
+        } catch (error) {
+          console.error('SpeedPulse test failed:', error);
+          setStatus('Test could not finish', 'Please check your connection and try again.', 'normal');
+          toast('Something interrupted the test. Please try again.');
+          updateProgress(0, 'Ready to retry');
+          setStep(-1);
+        } finally {
+          setTestingUI(false);
+        }
+      }
+
+      function createPngIcon(size) {
+        const canvas = document.createElement('canvas');
+        canvas.width = size; canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return '';
+        const scale = size / 512;
+        ctx.scale(scale, scale);
+        const bg = ctx.createLinearGradient(35, 30, 480, 490);
+        bg.addColorStop(0, '#111b42'); bg.addColorStop(.56, '#0a0e27'); bg.addColorStop(1, '#251052');
+        ctx.fillStyle = bg;
+        const r = 118;
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 512, 512, r);
+        ctx.fill();
+        const glow = ctx.createRadialGradient(250, 236, 12, 250, 240, 205);
+        glow.addColorStop(0, 'rgba(0,212,255,.24)'); glow.addColorStop(1, 'rgba(123,47,247,0)');
+        ctx.fillStyle = glow; ctx.fillRect(0, 0, 512, 512);
+        ctx.beginPath(); ctx.arc(256, 256, 172, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,212,255,.24)'; ctx.lineWidth = 5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(256, 256, 151, -.72, Math.PI * 1.37);
+        ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 15; ctx.lineCap = 'round'; ctx.shadowColor = '#00d4ff'; ctx.shadowBlur = 28; ctx.stroke(); ctx.shadowBlur = 0;
+        const bolt = ctx.createLinearGradient(205, 125, 326, 380);
+        bolt.addColorStop(0, '#9ff7ff'); bolt.addColorStop(.55, '#00d4ff'); bolt.addColorStop(1, '#9c70ff');
+        ctx.beginPath();
+        ctx.moveTo(285, 93); ctx.lineTo(181, 275); ctx.lineTo(250, 275); ctx.lineTo(221, 419); ctx.lineTo(342, 220); ctx.lineTo(270, 220); ctx.closePath();
+        ctx.fillStyle = bolt; ctx.shadowColor = '#00d4ff'; ctx.shadowBlur = 26; ctx.fill(); ctx.shadowBlur = 0;
+        return canvas.toDataURL('image/png');
+      }
+
+      function getAppPageUrl() {
+        const page = new URL(location.href);
+        page.hash = '';
+        return page.href;
+      }
+
+      function createManifestObject() {
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const icons = sizes.map(size => ({ src: createPngIcon(size), sizes: `${size}x${size}`, type: 'image/png', purpose: 'any maskable' }));
+        const startUrl = getAppPageUrl();
+        let scope;
+        try { scope = new URL('./', startUrl).href; } catch (_) { scope = undefined; }
+        const manifest = {
+          id: startUrl,
+          name: 'SpeedPulse - Internet Speed Test',
+          short_name: 'SpeedPulse',
+          description: 'A beautifully clear internet speed test.',
+          start_url: startUrl,
+          display: 'standalone',
+          display_override: ['standalone', 'minimal-ui'],
+          orientation: 'portrait-primary',
+          theme_color: els.root.dataset.theme === 'light' ? '#f2f6ff' : '#0a0e27',
+          background_color: els.root.dataset.theme === 'light' ? '#f2f6ff' : '#0a0e27',
+          icons
+        };
+        if (scope && /^https?:$/.test(location.protocol)) manifest.scope = scope;
+        return { manifest, icons };
+      }
+
+      function refreshManifest() {
+        try {
+          const { manifest, icons } = createManifestObject();
+          const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+          const nextUrl = URL.createObjectURL(blob);
+          $('#manifestLink').href = nextUrl;
+          if (state.manifestUrl) URL.revokeObjectURL(state.manifestUrl);
+          state.manifestUrl = nextUrl;
+          els.appPreviewIcon.src = icons.find(icon => icon.sizes === '192x192').src;
+        } catch (error) {
+          console.warn('SpeedPulse manifest could not be created in this browser.', error);
+        }
+      }
+
+      async function registerInlineServiceWorker() {
+        // Browsers only accept same-origin http(s) scripts for service workers. This inline Blob attempt is
+        // intentionally guarded and caught: file:// and blob: service-worker URLs are rejected by the platform.
+        if (!('serviceWorker' in navigator) || !window.isSecureContext || !/^https?:$/.test(location.protocol)) {
+          state.serviceWorkerState = 'unavailable';
+          return;
+        }
+        const pageUrl = JSON.stringify(getAppPageUrl());
+        const workerSource = `
+          const CACHE_NAME = 'speedpulse-shell-v1';
+          const PAGE_URL = ${pageUrl};
+          self.addEventListener('install', event => {
+            event.waitUntil((async () => {
+              const cache = await caches.open(CACHE_NAME);
+              try { await cache.add(PAGE_URL); } catch (_) {}
+              await self.skipWaiting();
+            })());
+          });
+          self.addEventListener('activate', event => {
+            event.waitUntil((async () => {
+              const keys = await caches.keys();
+              await Promise.all(keys.filter(key => key.startsWith('speedpulse-') && key !== CACHE_NAME).map(key => caches.delete(key)));
+              await self.clients.claim();
+            })());
+          });
+          self.addEventListener('fetch', event => {
+            const request = event.request;
+            if (request.method !== 'GET') return;
+            event.respondWith((async () => {
+              const cache = await caches.open(CACHE_NAME);
+              try {
+                const response = await fetch(request);
+                if (response.ok && new URL(request.url).origin === self.location.origin) {
+                  const copy = response.clone();
+                  event.waitUntil(cache.put(request, copy).catch(() => {}));
+                }
+                return response;
+              } catch (error) {
+                const cached = await cache.match(request);
+                if (cached) return cached;
+                if (request.mode === 'navigate') {
+                  const page = await cache.match(PAGE_URL);
+                  if (page) return page;
+                }
+                throw error;
+              }
+            })());
+          });
+        `;
+        let blobUrl = '';
+        try {
+          blobUrl = URL.createObjectURL(new Blob([workerSource], { type: 'text/javascript' }));
+          await navigator.serviceWorker.register(blobUrl);
+          state.serviceWorkerState = 'registered';
+        } catch (error) {
+          state.serviceWorkerState = 'blocked';
+          console.info('SpeedPulse: a standalone same-origin sw.js is required for an installable offline PWA.', error && error.message ? error.message : error);
+        } finally {
+          if (blobUrl) setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+        }
+      }
+
+      function updateInstallDialog() {
+        if (state.deferredInstallPrompt) {
+          els.installNowButton.textContent = 'Install SpeedPulse';
+          els.pwaNote.textContent = 'Your browser has offered installation. Choose Install to add SpeedPulse to your apps. The page is designed to remain useful offline, but a truly cached PWA requires a same-origin service-worker file served over HTTPS.';
+        } else {
+          els.installNowButton.textContent = 'How to install';
+          if (location.protocol === 'file:') {
+            els.pwaNote.textContent = 'You are viewing the standalone HTML file. It works directly from disk, but browsers disable PWA installation and service workers on file://. To install it, serve the file from HTTPS and include a same-origin service-worker script.';
+          } else if (!window.isSecureContext) {
+            els.pwaNote.textContent = 'PWA installation requires a secure HTTPS origin (localhost is allowed for development). This browser has not offered an install prompt for this page.';
+          } else if (state.serviceWorkerState === 'blocked' || state.serviceWorkerState === 'unavailable') {
+            els.pwaNote.textContent = 'This browser has not offered installation. Browser security requires a same-origin HTTPS service-worker file; registering a service worker from an inline Blob is blocked. The single-file test remains fully usable.';
+          } else {
+            els.pwaNote.textContent = 'If your browser supports installation, use its menu and choose “Install app” or “Add to Home Screen.” Some browsers only offer this after a manifest and a same-origin service worker are available.';
+          }
+        }
+      }
+
+      async function handleInstallAction() {
+        if (!state.deferredInstallPrompt) {
+          closeDialog(els.installDialog);
+          if (location.protocol === 'file:') toast('For installation, host this page on HTTPS. The local HTML still works offline.');
+          else toast('Open your browser menu and choose “Install app” or “Add to Home Screen.”', 4200);
+          return;
+        }
+        const promptEvent = state.deferredInstallPrompt;
+        state.deferredInstallPrompt = null;
+        closeDialog(els.installDialog);
+        try {
+          await promptEvent.prompt();
+          const choice = await promptEvent.userChoice;
+          if (choice && choice.outcome === 'accepted') toast('SpeedPulse is being installed.');
+          else toast('Installation was dismissed. You can try again from the browser menu.');
+        } catch (_) { toast('Your browser could not start installation. Try its app menu.'); }
+        updateInstallDialog();
+      }
+
+      function initReveal() {
+        const items = $$('.reveal');
+        if (!('IntersectionObserver' in window)) {
+          items.forEach(item => item.classList.add('is-visible'));
+          return;
+        }
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: .08, rootMargin: '0px 0px -28px 0px' });
+        items.forEach(item => observer.observe(item));
+      }
+
+      function initAmbientCanvas() {
+        if (reduceMotion) return;
+        const canvas = $('#ambientCanvas');
+        const ctx = canvas.getContext('2d', { alpha: true });
+        if (!ctx) return;
+        let width = 0, height = 0, frame = 0, last = 0;
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        const particles = Array.from({ length: 33 }, () => ({ x: Math.random(), y: Math.random(), r: randomBetween(.6, 1.8), vx: randomBetween(-.000055, .000055), vy: randomBetween(-.00008, .00008), phase: Math.random() * Math.PI * 2 }));
+        const resize = () => {
+          const box = canvas.getBoundingClientRect();
+          width = box.width; height = box.height;
+          canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          draw(performance.now());
+        };
+        const draw = now => {
+          if (!width || !height) return;
+          ctx.clearRect(0, 0, width, height);
+          const light = els.root.dataset.theme === 'light';
+          const color = light ? '30, 117, 168' : '137, 182, 255';
+          particles.forEach(p => {
+            p.x += p.vx * Math.min(32, now - (last || now));
+            p.y += p.vy * Math.min(32, now - (last || now));
+            if (p.x < -.02) p.x = 1.02; if (p.x > 1.02) p.x = -.02;
+            if (p.y < -.02) p.y = 1.02; if (p.y > 1.02) p.y = -.02;
+            const alpha = .12 + (Math.sin(now / 1700 + p.phase) + 1) * .12;
+            ctx.beginPath(); ctx.arc(p.x * width, p.y * height, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${color},${alpha})`; ctx.fill();
+          });
+          last = now;
+          if (!document.hidden) frame = requestAnimationFrame(draw);
+          else frame = 0;
+        };
+        const resizeObserver = window.ResizeObserver ? new ResizeObserver(resize) : null;
+        if (resizeObserver) resizeObserver.observe(document.documentElement);
+        else window.addEventListener('resize', resize, { passive: true });
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden && !frame) frame = requestAnimationFrame(draw);
+          else if (document.hidden && frame) { cancelAnimationFrame(frame); frame = 0; }
+        });
+        resize();
+        frame = requestAnimationFrame(draw);
+      }
+
+      function initEvents() {
+        els.themeButton.addEventListener('click', () => setTheme(els.root.dataset.theme === 'dark' ? 'light' : 'dark'));
+        els.soundButton.addEventListener('click', async () => {
+          state.soundOn = !state.soundOn;
+          try { localStorage.setItem(SOUND_KEY, state.soundOn ? 'on' : 'off'); } catch (_) {}
+          setSoundButton();
+          if (state.soundOn) { await ensureAudio(); playTick(90, true); toast('Subtle sound effects enabled.'); }
+          else toast('Sound effects muted.');
+        });
+        els.startButton.addEventListener('click', startTest);
+        els.shareButton.addEventListener('click', shareResults);
+        els.installButton.addEventListener('click', () => { updateInstallDialog(); openDialog(els.installDialog); });
+        els.installNowButton.addEventListener('click', handleInstallAction);
+        els.clearHistoryButton.addEventListener('click', () => openDialog(els.clearDialog));
+        els.confirmClearButton.addEventListener('click', () => {
+          state.history = [];
+          persistHistory();
+          closeDialog(els.clearDialog);
+          toast('Your local test history has been cleared.');
+        });
+        document.addEventListener('click', event => {
+          const close = event.target.closest('[data-close-dialog]');
+          if (close) closeDialog(document.getElementById(close.dataset.closeDialog));
+          if (event.target instanceof HTMLDialogElement && event.target.open && event.target === els.installDialog) {
+            const rect = event.target.getBoundingClientRect();
+            if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeDialog(event.target);
+          }
+        });
+        els.historyList.addEventListener('click', event => {
+          const button = event.target.closest('[data-delete-id]');
+          if (!button) return;
+          state.history = state.history.filter(item => String(item.id) !== button.dataset.deleteId);
+          persistHistory();
+          toast('Test result removed from this device.');
+        });
+        window.addEventListener('online', setOnlineStatus);
+        window.addEventListener('offline', setOnlineStatus);
+        const conn = connectionInfo();
+        if (conn && conn.addEventListener) conn.addEventListener('change', updateConnectionDisplay);
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 8) els.header.classList.add('is-scrolled');
+          else els.header.classList.remove('is-scrolled');
+        }, { passive: true });
+        document.addEventListener('keydown', event => {
+          if (event.code !== 'Space' || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+          const target = event.target;
+          const interactive = target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A|SUMMARY)$/.test(target.tagName));
+          if (interactive) return;
+          event.preventDefault();
+          startTest();
+        });
+        window.addEventListener('beforeinstallprompt', event => {
+          event.preventDefault();
+          state.deferredInstallPrompt = event;
+          els.installButton.classList.add('is-installable');
+          els.installButton.setAttribute('aria-label', 'Install SpeedPulse app');
+          updateInstallDialog();
+        });
+        window.addEventListener('appinstalled', () => {
+          state.deferredInstallPrompt = null;
+          els.installButton.classList.remove('is-installable');
+          toast('SpeedPulse was installed successfully.');
+          updateInstallDialog();
+        });
+      }
+
+      function init() {
+        els.copyrightYear.textContent = String(new Date().getFullYear());
+        initTheme();
+        try { state.soundOn = localStorage.getItem(SOUND_KEY) === 'on'; } catch (_) {}
+        setSoundButton();
+        state.history = readHistory();
+        renderHistory();
+        setOnlineStatus();
+        updateConnectionDisplay();
+        initReveal();
+        initAmbientCanvas();
+        initEvents();
+        renderGauge(0);
+        updateSocialShare(null);
+        refreshManifest();
+        registerInlineServiceWorker().then(updateInstallDialog).catch(() => { state.serviceWorkerState = 'unavailable'; updateInstallDialog(); });
+        loadIpInfo();
+        loadServerInfo();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
